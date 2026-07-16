@@ -1,0 +1,12 @@
+import { createBrowserClient } from '@supabase/ssr'
+
+/**
+ * Supabase client untuk dipakai di Client Component ('use client').
+ * Contoh: form submit, realtime subscription, interaksi user di browser.
+ */
+export function createClient() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}

@@ -1,6 +1,7 @@
 'use client'
 
 import type { Category, JobType } from '@/lib/types'
+import type { SortOption } from './JobBoard'
 
 const JOB_TYPES: JobType[] = ['Full-time', 'Part-time', 'Contract', 'Freelance']
 
@@ -10,6 +11,8 @@ interface FilterBarProps {
   onCategoryChange: (slug: string | null) => void
   activeJobType: JobType | null
   onJobTypeChange: (type: JobType | null) => void
+  sortBy: SortOption
+  onSortChange: (sort: SortOption) => void
   resultCount: number
 }
 
@@ -19,6 +22,8 @@ export default function FilterBar({
   onCategoryChange,
   activeJobType,
   onJobTypeChange,
+  sortBy,
+  onSortChange,
   resultCount,
 }: FilterBarProps) {
   return (
@@ -39,7 +44,7 @@ export default function FilterBar({
         ))}
       </div>
 
-      {/* Filter Tipe Pekerjaan + counter */}
+      {/* Filter Tipe Pekerjaan + Sort + counter */}
       <div className="flex items-center gap-3">
         <select
           value={activeJobType ?? ''}
@@ -52,6 +57,14 @@ export default function FilterBar({
               {type}
             </option>
           ))}
+        </select>
+        <select
+          value={sortBy}
+          onChange={(e) => onSortChange(e.target.value as SortOption)}
+          className="rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-3.5 py-1.5 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--color-primary)]"
+        >
+          <option value="newest">Terbaru</option>
+          <option value="salary">Gaji Tertinggi</option>
         </select>
         <span className="whitespace-nowrap text-sm text-[var(--color-muted)]">
           <strong className="text-[var(--color-ink)]">{resultCount}</strong> loker

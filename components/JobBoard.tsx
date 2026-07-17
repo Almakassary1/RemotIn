@@ -6,6 +6,8 @@ import type { Job, Category, JobType } from '@/lib/types'
 import FilterBar from './FilterBar'
 import JobCard from './JobCard'
 
+export type SortOption = 'newest' | 'salary'
+
 interface JobBoardProps {
   initialJobs: Job[]
   categories: Category[]
@@ -27,6 +29,7 @@ export default function JobBoard({
   const [query, setQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState<string | null>(initialCategorySlug)
   const [activeJobType, setActiveJobType] = useState<JobType | null>(null)
+  const [sortBy, setSortBy] = useState<SortOption>('newest')
 
   // Filtering dilakukan di client karena data sudah di-fetch sekaligus dari server.
   // Untuk skala data yang lebih besar nanti, ini bisa dipindah jadi query Supabase
@@ -46,6 +49,20 @@ export default function JobBoard({
       return matchesQuery && matchesCategory && matchesJobType
     })
   }, [initialJobs, query, activeCategory, activeJobType])
+
+  // "newest" sengaja tidak di-sort ulang di sini — initialJobs sudah datang
+  // dari server dalam urutan featured dulu, lalu created_at terbaru (lihat
+  // app/page.tsx), jadi urutan itu otomatis kepakai lagi begitu sortBy
+  // dibalik ke "newest". Cuma "salary" yang butuh sorting eksplisit.
+  const sortedJobs = useMemo(() => {
+    if (sortBy !== 'salary') return filteredJobs
+
+    return [...filteredJobs].sort((a, b) => {
+      const salaryA = a.salary_max ?? a.salary_min ?? -1
+      const salaryB = b.salary_max ?? b.salary_min ?? -1
+      return salaryB - salaryA
+    })
+  }, [filteredJobs, sortBy])
 
   return (
     <main className="min-h-screen bg-[var(--color-bg)]">
@@ -84,16 +101,18 @@ export default function JobBoard({
           onCategoryChange={setActiveCategory}
           activeJobType={activeJobType}
           onJobTypeChange={setActiveJobType}
-          resultCount={filteredJobs.length}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+          resultCount={sortedJobs.length}
         />
 
         <div className="mt-6 flex flex-col gap-3">
-          {filteredJobs.length === 0 ? (
+          {sortedJobs.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-[var(--color-line)] py-16 text-center text-sm text-[var(--color-muted)]">
               Belum ada loker yang cocok. Coba ubah filter atau kata kunci pencarian.
             </div>
           ) : (
-            filteredJobs.map((job) => <JobCard key={job.id} job={job} />)
+            sortedJobs.map((job) => <JobCard key={job.id} job={job} />)
           )}
         </div>
       </section>

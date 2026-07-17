@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { Briefcase, Wallet, ArrowRight } from 'lucide-react'
+import { Briefcase, Wallet, ArrowRight, Clock } from 'lucide-react'
+import { formatRelativeDate } from '@/lib/job-utils'
 import type { Job } from '@/lib/types'
 
 export default function JobCard({ job }: { job: Job }) {
@@ -50,6 +51,10 @@ export default function JobCard({ job }: { job: Job }) {
               {job.salary_range}
             </span>
           )}
+          <span className="inline-flex items-center gap-1">
+            <Clock className="h-3.5 w-3.5" />
+            {formatRelativeDate(job.created_at)}
+          </span>
         </div>
       </div>
 

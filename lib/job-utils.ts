@@ -15,6 +15,29 @@ export function getExpiryCutoffISOString(): string {
   return new Date(Date.now() - JOB_EXPIRY_DAYS * 24 * 60 * 60 * 1000).toISOString()
 }
 
+// Format tanggal relatif ("2 hari lalu") untuk JobCard — dipakai di
+// tampilan list, bukan halaman detail (yang tetap pakai tanggal absolut
+// lengkap supaya jelas kapan persisnya loker diposting).
+// Loker maksimal berumur 30 hari (lihat JOB_EXPIRY_DAYS), jadi unit
+// terbesar yang realistis muncul di sini adalah "minggu", tidak perlu
+// sampai "bulan".
+export function formatRelativeDate(createdAt: string): string {
+  const diffMs = Date.now() - new Date(createdAt).getTime()
+  const diffMinutes = Math.floor(diffMs / (1000 * 60))
+  const diffHours = Math.floor(diffMinutes / 60)
+  const diffDays = Math.floor(diffHours / 24)
+
+  if (diffDays >= 1) {
+    if (diffDays === 1) return 'Kemarin'
+    if (diffDays < 7) return `${diffDays} hari lalu`
+    const diffWeeks = Math.floor(diffDays / 7)
+    return diffWeeks === 1 ? '1 minggu lalu' : `${diffWeeks} minggu lalu`
+  }
+  if (diffHours >= 1) return `${diffHours} jam lalu`
+  if (diffMinutes >= 1) return `${diffMinutes} menit lalu`
+  return 'Baru saja'
+}
+
 // =====================================================================
 // JSON-LD JobPosting — syarat wajib supaya loker bisa muncul di Google
 // for Jobs. Referensi: https://developers.google.com/search/docs/appearance/structured-data/job-posting
@@ -50,9 +73,6 @@ export function buildJobPostingSchema(job: Job) {
       name: job.company_name,
       ...(job.company_logo ? { logo: job.company_logo } : {}),
     },
-    // Loker remote: pakai jobLocationType + applicantLocationRequirements,
-    // bukan jobLocation (alamat fisik) — ini yang direkomendasikan Google
-    // khusus untuk lowongan remote.
     jobLocationType: 'TELECOMMUTE',
     applicantLocationRequirements: {
       '@type': 'Country',

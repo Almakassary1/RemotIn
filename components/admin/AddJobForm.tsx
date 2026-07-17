@@ -1,0 +1,355 @@
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+import { Loader2, ChevronDown, ArrowLeft } from 'lucide-react'
+import { addJob } from '@/app/admin/tambah-loker/actions'
+import type { Category, JobType } from '@/lib/types'
+import Toast from '@/components/Toast'
+
+interface AddJobFormProps {
+  categories: Category[]
+}
+
+const JOB_TYPES: JobType[] = ['Full-time', 'Part-time', 'Contract', 'Freelance']
+
+const initialForm = {
+  title: '',
+  company_name: '',
+  company_logo: '',
+  category_id: '',
+  job_type: 'Full-time' as JobType,
+  location: 'Remote - Indonesia',
+  salary_min: '',
+  salary_max: '',
+  apply_url: '',
+  description: '',
+  requirements: '',
+  benefits: '',
+}
+
+type FormState = typeof initialForm
+
+const inputClass =
+  'w-full rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-2.5 text-sm text-[var(--color-ink)] outline-none transition placeholder:text-[var(--color-muted)]/70 focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/15'
+const labelClass = 'mb-1.5 block text-sm font-medium text-[var(--color-ink)]'
+
+export default function AddJobForm({ categories }: AddJobFormProps) {
+  const [form, setForm] = useState<FormState>(initialForm)
+  const [isFeatured, setIsFeatured] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
+  function update<K extends keyof FormState>(key: K, value: FormState[K]) {
+    setForm((prev) => ({ ...prev, [key]: value }))
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setLoading(true)
+    setToast(null)
+
+    const formData = new FormData(e.currentTarget)
+    if (isFeatured) formData.set('is_featured', 'on')
+
+    const submittedTitle = form.title
+    const result = await addJob(formData)
+
+    if (!result.success) {
+      setToast({ type: 'error', message: result.error ?? 'Gagal menambah loker.' })
+      setLoading(false)
+      return
+    }
+
+    // Reset form (bukan redirect) — admin bisa langsung input loker
+    // berikutnya tanpa navigasi ulang, penting buat isi banyak loker sekaligus.
+    setForm(initialForm)
+    setIsFeatured(false)
+    setToast({ type: 'success', message: `"${submittedTitle}" berhasil ditambahkan & langsung tayang.` })
+    setLoading(false)
+  }
+
+  return (
+    <main className="min-h-screen bg-[var(--color-bg)]">
+      <div className="mx-auto max-w-2xl px-6 py-10 sm:py-14">
+        <Link
+          href="/admin"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-primary)]"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Kembali ke Dashboard
+        </Link>
+
+        <div className="mt-4">
+          <h1 className="font-[family-name:var(--font-display)] text-2xl font-semibold text-[var(--color-ink)] sm:text-3xl">
+            Tambah Loker Manual
+          </h1>
+          <p className="mt-1.5 text-sm text-[var(--color-muted)]">
+            Loker yang ditambahkan di sini langsung tayang ke publik — tanpa proses moderasi,
+            karena kamu sendiri adminnya.
+          </p>
+        </div>
+
+        <form
+          onSubmit={handleSubmit}
+          className="mt-8 flex flex-col gap-6 rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 sm:p-8"
+        >
+          {/* Posisi & Perusahaan */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <div>
+              <label className={labelClass} htmlFor="title">
+                Judul Posisi *
+              </label>
+              <input
+                id="title"
+                name="title"
+                type="text"
+                required
+                maxLength={150}
+                value={form.title}
+                onChange={(e) => update('title', e.target.value)}
+                placeholder="mis. Backend Developer"
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className={labelClass} htmlFor="company_name">
+                Nama Perusahaan *
+              </label>
+              <input
+                id="company_name"
+                name="company_name"
+                type="text"
+                required
+                maxLength={150}
+                value={form.company_name}
+                onChange={(e) => update('company_name', e.target.value)}
+                placeholder="mis. PT Teknologi Maju"
+                className={inputClass}
+              />
+            </div>
+          </div>
+
+          {/* Logo & Lokasi */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <div>
+              <label className={labelClass} htmlFor="company_logo">
+                URL Logo Perusahaan
+              </label>
+              <input
+                id="company_logo"
+                name="company_logo"
+                type="url"
+                value={form.company_logo}
+                onChange={(e) => update('company_logo', e.target.value)}
+                placeholder="https://... (opsional)"
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className={labelClass} htmlFor="location">
+                Lokasi *
+              </label>
+              <input
+                id="location"
+                name="location"
+                type="text"
+                required
+                value={form.location}
+                onChange={(e) => update('location', e.target.value)}
+                className={inputClass}
+              />
+            </div>
+          </div>
+
+          {/* Kategori */}
+          <div>
+            <label className={labelClass} htmlFor="category_id">
+              Kategori Pekerjaan *
+            </label>
+            <div className="relative">
+              <select
+                id="category_id"
+                name="category_id"
+                required
+                value={form.category_id}
+                onChange={(e) => update('category_id', e.target.value)}
+                className={`${inputClass} appearance-none pr-10`}
+              >
+                <option value="" disabled>
+                  Pilih kategori...
+                </option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-muted)]" />
+            </div>
+          </div>
+
+          {/* Tipe Pekerjaan */}
+          <div>
+            <span className={labelClass}>Tipe Pekerjaan *</span>
+            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Tipe Pekerjaan">
+              {JOB_TYPES.map((type) => (
+                <label key={type} className="cursor-pointer">
+                  <input
+                    type="radio"
+                    name="job_type"
+                    value={type}
+                    checked={form.job_type === type}
+                    onChange={() => update('job_type', type)}
+                    className="peer sr-only"
+                  />
+                  <span className="block rounded-full border border-[var(--color-line)] px-4 py-2 text-sm font-medium text-[var(--color-muted)] transition peer-checked:border-[var(--color-primary)] peer-checked:bg-[var(--color-primary)] peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--color-primary)] peer-focus-visible:ring-offset-2">
+                    {type}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Gaji */}
+          <div>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <div>
+                <label className={labelClass} htmlFor="salary_min">
+                  Gaji Minimal (Rp)
+                </label>
+                <input
+                  id="salary_min"
+                  name="salary_min"
+                  type="number"
+                  min={0}
+                  inputMode="numeric"
+                  value={form.salary_min}
+                  onChange={(e) => update('salary_min', e.target.value)}
+                  placeholder="mis. 8000000"
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass} htmlFor="salary_max">
+                  Gaji Maksimal (Rp)
+                </label>
+                <input
+                  id="salary_max"
+                  name="salary_max"
+                  type="number"
+                  min={0}
+                  inputMode="numeric"
+                  value={form.salary_max}
+                  onChange={(e) => update('salary_max', e.target.value)}
+                  placeholder="mis. 12000000"
+                  className={inputClass}
+                />
+              </div>
+            </div>
+            <p className="mt-1.5 text-xs text-[var(--color-muted)]">
+              Opsional — kosongkan jika tidak ingin mencantumkan kisaran gaji.
+            </p>
+          </div>
+
+          {/* Apply URL */}
+          <div>
+            <label className={labelClass} htmlFor="apply_url">
+              Link Form Lamaran / Email *
+            </label>
+            <input
+              id="apply_url"
+              name="apply_url"
+              type="url"
+              required
+              value={form.apply_url}
+              onChange={(e) => update('apply_url', e.target.value)}
+              placeholder="https://... atau mailto:hr@perusahaan.com"
+              className={inputClass}
+            />
+          </div>
+
+          {/* Deskripsi */}
+          <div>
+            <label className={labelClass} htmlFor="description">
+              Deskripsi Pekerjaan *
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              required
+              rows={5}
+              maxLength={5000}
+              value={form.description}
+              onChange={(e) => update('description', e.target.value)}
+              placeholder="Jelaskan tanggung jawab dan konteks pekerjaan ini..."
+              className={`${inputClass} resize-y`}
+            />
+          </div>
+
+          {/* Requirements */}
+          <div>
+            <label className={labelClass} htmlFor="requirements">
+              Persyaratan / Kualifikasi
+            </label>
+            <textarea
+              id="requirements"
+              name="requirements"
+              rows={4}
+              maxLength={3000}
+              value={form.requirements}
+              onChange={(e) => update('requirements', e.target.value)}
+              placeholder={'Satu poin per baris, mis:\nMinimal 2 tahun pengalaman\nMahir Bahasa Inggris'}
+              className={`${inputClass} resize-y`}
+            />
+          </div>
+
+          {/* Benefits */}
+          <div>
+            <label className={labelClass} htmlFor="benefits">
+              Benefit / Fasilitas
+            </label>
+            <textarea
+              id="benefits"
+              name="benefits"
+              rows={4}
+              maxLength={3000}
+              value={form.benefits}
+              onChange={(e) => update('benefits', e.target.value)}
+              placeholder={'Satu poin per baris, mis:\nAsuransi kesehatan\nJam kerja fleksibel'}
+              className={`${inputClass} resize-y`}
+            />
+          </div>
+
+          {/* Featured toggle — cuma ada di form admin, tidak ada di form publik */}
+          <label className="flex cursor-pointer items-center gap-2.5">
+            <input
+              type="checkbox"
+              checked={isFeatured}
+              onChange={(e) => setIsFeatured(e.target.checked)}
+              className="h-4 w-4 rounded border-[var(--color-line)] text-[var(--color-primary)] focus:ring-[var(--color-primary)]/30"
+            />
+            <span className="text-sm font-medium text-[var(--color-ink)]">Tandai sebagai Featured</span>
+          </label>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#0A5347] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Menyimpan...
+              </>
+            ) : (
+              'Tambah & Tayangkan Loker'
+            )}
+          </button>
+        </form>
+      </div>
+
+      {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
+    </main>
+  )
+}

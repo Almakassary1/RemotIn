@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { isAdmin } from '@/lib/admin-auth'
 import { createAdminClient } from '@/utils/supabase/admin'
@@ -66,14 +67,22 @@ export default async function AdminPage() {
               Kelola seluruh lowongan kerja yang masuk ke RemotIn.
             </p>
           </div>
-          <form action={logout}>
-            <button
-              type="submit"
-              className="self-start rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-2 text-sm font-medium text-[var(--color-muted)] transition hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+          <div className="flex items-center gap-2">
+            <Link
+              href="/admin/tambah-loker"
+              className="self-start rounded-full bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#0A5347]"
             >
-              Keluar
-            </button>
-          </form>
+              + Tambah Loker
+            </Link>
+            <form action={logout}>
+              <button
+                type="submit"
+                className="self-start rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-2 text-sm font-medium text-[var(--color-muted)] transition hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+              >
+                Keluar
+              </button>
+            </form>
+          </div>
         </div>
 
         <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Wifi, Menu, X } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 
 const NAV_LINKS = [
   { label: 'Cari Loker', href: '/' },
@@ -22,9 +22,7 @@ export default function Navbar() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
-          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--color-primary)]">
-            <Wifi className="h-4 w-4 text-white" strokeWidth={2.5} />
-          </span>
+          <img src="/logo-mark.svg" alt="RemotIn" className="h-8 w-8" />
           <span className="font-[family-name:var(--font-display)] text-lg font-semibold text-[var(--color-ink)]">
             Remot<span className="text-[var(--color-primary)]">In</span>
           </span>

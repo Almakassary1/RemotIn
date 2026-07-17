@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Wifi, Mail } from 'lucide-react'
+import { Mail } from 'lucide-react'
 // Instagram & LinkedIn sengaja dihapus dari lucide-react (mereka hanya
 // menyediakan ikon UI generik, bukan logo brand) — jadi untuk ikon
 // brand/sosial media, kita pakai react-icons.
@@ -34,8 +34,8 @@ export default function Footer() {
           {/* Brand */}
           <div className="sm:col-span-2 md:col-span-1">
             <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--color-primary)]">
-                <Wifi className="h-4 w-4 text-white" strokeWidth={2.5} />
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#F7F5F0]">
+                <img src="/logo-mark.svg" alt="RemotIn" className="h-5 w-5" />
               </span>
               <span className="font-[family-name:var(--font-display)] text-lg font-semibold text-[#F7F5F0]">
                 Remot<span className="text-emerald-400">In</span>

@@ -55,6 +55,7 @@ export default function FilterBar({
             onClick={() => onCategoryChange(cat.slug)}
             className={pillClass(activeCategory === cat.slug)}
           >
+            {cat.icon && <span className="mr-1">{cat.icon}</span>}
             {cat.name}
           </button>
         ))}

@@ -45,19 +45,9 @@ function buildConfirmationEmailHtml(confirmUrl: string): string {
   return `
     <div style="font-family: -apple-system, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
       <h1 style="color: #0E6E5B; font-size: 20px; margin-bottom: 4px;">RemotIn</h1>
-      <p style="color: #16231F; font-size: 14px; line-height: 1.6;">
-        Terima kasih sudah daftar newsletter RemotIn. Klik tombol di bawah untuk
-        konfirmasi alamat email kamu dan mulai terima info loker remote terbaru.
-      </p>
-      
-        href="${confirmUrl}"
-        style="display: inline-block; margin-top: 16px; background: #0E6E5B; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600;"
-      >
-        Konfirmasi Email
-      </a>
-      <p style="color: #6b7280; font-size: 12px; margin-top: 24px;">
-        Kalau kamu nggak merasa daftar di RemotIn, abaikan saja email ini.
-      </p>
+      <p style="color: #16231F; font-size: 14px; line-height: 1.6;">Terima kasih sudah daftar newsletter RemotIn. Klik tombol di bawah untuk konfirmasi alamat email kamu dan mulai terima info loker remote terbaru.</p>
+      <a href="${confirmUrl}" style="display: inline-block; margin-top: 16px; background: #0E6E5B; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600;">Konfirmasi Email</a>
+      <p style="color: #6b7280; font-size: 12px; margin-top: 24px;">Kalau kamu nggak merasa daftar di RemotIn, abaikan saja email ini.</p>
     </div>
   `
 }

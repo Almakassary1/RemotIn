@@ -9,7 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [{ data: jobs }, { data: categories }] = await Promise.all([
     supabase
       .from('jobs')
-      .select('id, created_at')
+      .select('id, created_at, company_name')
       .eq('is_approved', true)
       .gte('created_at', getExpiryCutoffISOString()),
     supabase.from('categories').select('slug'),
@@ -37,5 +37,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  return [...staticRoutes, ...categoryRoutes, ...jobRoutes]
+  // Satu route per nama perusahaan unik — dedupe pakai Set karena satu
+  // perusahaan bisa punya banyak baris loker. Sama seperti halaman
+  // detail loker, mengikuti pola nama perusahaan yang di-encode di URL
+  // (lihat app/jobs/[id]/page.tsx dan components/JobCard.tsx).
+  const uniqueCompanyNames = [...new Set((jobs ?? []).map((job) => job.company_name))]
+  const companyRoutes: MetadataRoute.Sitemap = uniqueCompanyNames.map((name) => ({
+    url: `${SITE_URL}/perusahaan/${encodeURIComponent(name)}`,
+    changeFrequency: 'weekly',
+    priority: 0.5,
+  }))
+
+  return [...staticRoutes, ...categoryRoutes, ...jobRoutes, ...companyRoutes]
 }

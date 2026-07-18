@@ -126,7 +126,10 @@ export default async function JobDetailPage({ params }: PageProps) {
               <h1 className="font-[family-name:var(--font-display)] text-2xl font-semibold leading-tight text-[var(--color-ink)] sm:text-3xl">
                 {job.title}
               </h1>
-              <p className="mt-1 flex items-center gap-1.5 text-[15px] text-[var(--color-muted)]">
+              <Link
+                href={`/perusahaan/${encodeURIComponent(job.company_name)}`}
+                className="mt-1 flex items-center gap-1.5 text-[15px] text-[var(--color-muted)] transition hover:text-[var(--color-primary)]"
+              >
                 {job.company_name}
                 {job.company_verified && (
                   <BadgeCheck
@@ -134,7 +137,7 @@ export default async function JobDetailPage({ params }: PageProps) {
                     aria-label="Perusahaan terverifikasi"
                   />
                 )}
-              </p>
+              </Link>
 
               <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[var(--color-muted)]">
                 <span className="inline-flex items-center gap-1.5">
@@ -280,14 +283,17 @@ export default async function JobDetailPage({ params }: PageProps) {
               <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]">
                 Tentang Perusahaan
               </h3>
-              <div className="mt-3 flex items-center gap-3">
+              <Link
+                href={`/perusahaan/${encodeURIComponent(job.company_name)}`}
+                className="mt-3 flex items-center gap-3 rounded-xl transition hover:opacity-80"
+              >
                 <img
                   src={job.company_logo ?? fallbackLogo}
                   alt={job.company_name}
                   className="h-10 w-10 rounded-lg object-cover"
                 />
                 <p className="text-sm font-medium text-[var(--color-ink)]">{job.company_name}</p>
-              </div>
+              </Link>
             </div>
 
             <a

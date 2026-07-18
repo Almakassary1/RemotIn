@@ -26,7 +26,7 @@ export default function JobBoard({
   initialJobs,
   categories,
   initialCategorySlug = null,
-  heroTitle = 'Kerja dari rumah, tanpa drama macet Jakarta.',
+  heroTitle = 'Kerja dari rumah, tanpa drama macet jalanan.',
   heroSubtitle = 'RemotIn mengurasi lowongan remote & WFH asli untuk talenta Indonesia — dari UI/UX hingga Virtual Assistant.',
 }: JobBoardProps) {
   const [query, setQuery] = useState('')

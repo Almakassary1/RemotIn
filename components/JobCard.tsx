@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Briefcase, Wallet, ArrowRight, Clock, Building2, Bookmark } from 'lucide-react'
+import { Briefcase, Wallet, ArrowRight, Clock, Building2, Bookmark, BadgeCheck } from 'lucide-react'
 import { formatRelativeDate, isJobHot } from '@/lib/job-utils'
 import { useSavedJobs } from '@/lib/useSavedJobs'
 import type { Job } from '@/lib/types'
@@ -59,7 +59,15 @@ export default function JobCard({ job }: { job: Job }) {
           <h3 className="truncate text-[15px] font-semibold text-[var(--color-ink)] sm:text-base">
             {job.title}
           </h3>
-          <p className="mt-0.5 text-sm text-[var(--color-muted)]">{job.company_name}</p>
+          <p className="mt-0.5 flex items-center gap-1 text-sm text-[var(--color-muted)]">
+            {job.company_name}
+            {job.company_verified && (
+              <BadgeCheck
+                className="h-3.5 w-3.5 flex-shrink-0 text-[var(--color-primary)]"
+                aria-label="Perusahaan terverifikasi"
+              />
+            )}
+          </p>
 
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[var(--color-muted)]">
             {job.work_arrangement === 'Hybrid' && (

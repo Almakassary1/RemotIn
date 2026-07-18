@@ -2,8 +2,8 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { Star, CheckCircle2, XCircle, Trash2, Loader2, Pencil } from 'lucide-react'
-import { toggleApproved, toggleFeatured, deleteJob } from '@/app/admin/actions'
+import { Star, CheckCircle2, XCircle, Trash2, Loader2, Pencil, BadgeCheck } from 'lucide-react'
+import { toggleApproved, toggleFeatured, toggleVerified, deleteJob } from '@/app/admin/actions'
 import { isJobExpired } from '@/lib/job-utils'
 import type { Job } from '@/lib/types'
 
@@ -36,6 +36,16 @@ export default function JobRow({ job, isPaid }: { job: Job; isPaid: boolean }) {
         await toggleFeatured(job.id, !job.is_featured)
       } catch (err) {
         alert(err instanceof Error ? err.message : 'Gagal mengubah status featured.')
+      }
+    })
+  }
+
+  function handleToggleVerified() {
+    startTransition(async () => {
+      try {
+        await toggleVerified(job.id, !job.company_verified)
+      } catch (err) {
+        alert(err instanceof Error ? err.message : 'Gagal mengubah status verifikasi.')
       }
     })
   }
@@ -105,6 +115,18 @@ export default function JobRow({ job, isPaid }: { job: Job; isPaid: boolean }) {
           >
             <Star className={`h-3.5 w-3.5 ${job.is_featured ? 'fill-amber-500 text-amber-500' : ''}`} />
             {job.is_featured ? 'Featured' : 'Standar'}
+          </button>
+          <button
+            onClick={handleToggleVerified}
+            disabled={isPending}
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition disabled:cursor-not-allowed ${
+              job.company_verified
+                ? 'bg-emerald-50 text-[var(--color-primary)]'
+                : 'bg-[var(--color-bg)] text-[var(--color-muted)]'
+            }`}
+          >
+            <BadgeCheck className="h-3.5 w-3.5" />
+            {job.company_verified ? 'Terverifikasi' : 'Belum Verifikasi'}
           </button>
           {isPaid && (
             <span

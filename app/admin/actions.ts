@@ -32,6 +32,19 @@ export async function toggleFeatured(jobId: string, nextValue: boolean) {
   revalidatePath('/jobs/[id]', 'page')
 }
 
+export async function toggleVerified(jobId: string, nextValue: boolean) {
+  await requireAdmin()
+
+  const supabase = createAdminClient()
+  const { error } = await supabase.from('jobs').update({ company_verified: nextValue }).eq('id', jobId)
+
+  if (error) throw new Error(error.message)
+
+  revalidatePath('/admin')
+  revalidatePath('/')
+  revalidatePath('/jobs/[id]', 'page')
+}
+
 export async function deleteJob(jobId: string) {
   await requireAdmin()
 

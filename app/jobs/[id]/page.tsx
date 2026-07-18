@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, Briefcase, Wallet, CalendarDays, Layers, Building2 } from 'lucide-react'
+import { ArrowLeft, Briefcase, Wallet, CalendarDays, Layers, Building2, BadgeCheck } from 'lucide-react'
 import { FaWhatsapp } from 'react-icons/fa'
 import SaveJobButton from '@/components/SaveJobButton'
 import { createClient } from '@/utils/supabase/server'
@@ -126,7 +126,15 @@ export default async function JobDetailPage({ params }: PageProps) {
               <h1 className="font-[family-name:var(--font-display)] text-2xl font-semibold leading-tight text-[var(--color-ink)] sm:text-3xl">
                 {job.title}
               </h1>
-              <p className="mt-1 text-[15px] text-[var(--color-muted)]">{job.company_name}</p>
+              <p className="mt-1 flex items-center gap-1.5 text-[15px] text-[var(--color-muted)]">
+                {job.company_name}
+                {job.company_verified && (
+                  <BadgeCheck
+                    className="h-4 w-4 flex-shrink-0 text-[var(--color-primary)]"
+                    aria-label="Perusahaan terverifikasi"
+                  />
+                )}
+              </p>
 
               <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[var(--color-muted)]">
                 <span className="inline-flex items-center gap-1.5">

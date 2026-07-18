@@ -25,6 +25,13 @@ function linesToArray(text: string): string[] {
     .filter(Boolean)
 }
 
+function commaToArray(text: string): string[] {
+  return text
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+}
+
 function formatSalaryRange(min: string, max: string): string | null {
   const minNum = min ? Number(min) : null
   const maxNum = max ? Number(max) : null
@@ -57,6 +64,7 @@ export async function updateJob(jobId: string, formData: FormData): Promise<Upda
   const description = formData.get('description')?.toString().trim() ?? ''
   const requirements = formData.get('requirements')?.toString() ?? ''
   const benefits = formData.get('benefits')?.toString() ?? ''
+  const tags = formData.get('tags')?.toString() ?? ''
 
   if (!title || !companyName || !categoryId || !jobType || !location || !applyUrl || !description) {
     return { success: false, error: 'Ada kolom wajib yang belum terisi.' }
@@ -96,6 +104,7 @@ export async function updateJob(jobId: string, formData: FormData): Promise<Upda
       description,
       requirements: linesToArray(requirements),
       benefits: linesToArray(benefits),
+      tags: commaToArray(tags),
     })
     .eq('id', jobId)
 

@@ -24,6 +24,8 @@ export interface Job {
   apply_url: string
   is_featured: boolean
   is_approved: boolean
+  // Badge "Terverifikasi" — lihat 10_company_verified.sql (Fase D #12)
+  company_verified: boolean
   salary_min: number | null
   salary_max: number | null
   created_at: string

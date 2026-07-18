@@ -28,6 +28,7 @@ const initialForm = {
   description: '',
   requirements: '',
   benefits: '',
+  tags: '',
 }
 
 type FormState = typeof initialForm
@@ -343,6 +344,25 @@ export default function AddJobForm({ categories }: AddJobFormProps) {
               placeholder={'Satu poin per baris, mis:\nAsuransi kesehatan\nJam kerja fleksibel'}
               className={`${inputClass} resize-y`}
             />
+          </div>
+
+          {/* Tags */}
+          <div>
+            <label className={labelClass} htmlFor="tags">
+              Skill / Tags
+            </label>
+            <input
+              id="tags"
+              name="tags"
+              type="text"
+              value={form.tags}
+              onChange={(e) => update('tags', e.target.value)}
+              placeholder="Pisahkan dengan koma, mis: React, Node.js, B2B SaaS"
+              className={inputClass}
+            />
+            <p className="mt-1.5 text-xs text-[var(--color-muted)]">
+              Opsional — muncul sebagai tag kecil di kartu loker.
+            </p>
           </div>
 
           {/* Featured toggle — cuma ada di form admin, tidak ada di form publik */}

@@ -52,6 +52,13 @@ function linesToArray(text: string): string[] {
     .filter(Boolean)
 }
 
+function commaToArray(text: string): string[] {
+  return text
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+}
+
 function formatSalaryRange(min: string, max: string): string | null {
   const minNum = min ? Number(min) : null
   const maxNum = max ? Number(max) : null
@@ -92,6 +99,7 @@ export async function submitJob(formData: FormData): Promise<SubmitJobResult> {
   const description = formData.get('description')?.toString().trim() ?? ''
   const requirements = formData.get('requirements')?.toString() ?? ''
   const benefits = formData.get('benefits')?.toString() ?? ''
+  const tags = formData.get('tags')?.toString() ?? ''
 
   // Validasi server-side — atribut `required` di HTML bisa dilewati siapa
   // pun yang memanggil Server Action ini langsung, jadi tetap divalidasi
@@ -134,6 +142,7 @@ export async function submitJob(formData: FormData): Promise<SubmitJobResult> {
       description,
       requirements: linesToArray(requirements),
       benefits: linesToArray(benefits),
+      tags: commaToArray(tags),
       is_approved: false, // moderasi manual — lihat migration 04
       is_featured: false,
     })

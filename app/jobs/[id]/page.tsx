@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { ArrowLeft, Briefcase, Wallet, CalendarDays, Layers, Building2 } from 'lucide-react'
 import { FaWhatsapp } from 'react-icons/fa'
 import { createClient } from '@/utils/supabase/server'
-import { getExpiryCutoffISOString, buildJobPostingSchema } from '@/lib/job-utils'
+import { getExpiryCutoffISOString, buildJobPostingSchema, isJobHot } from '@/lib/job-utils'
 import { SITE_URL } from '@/lib/site-config'
 import type { Job } from '@/lib/types'
 
@@ -108,10 +108,19 @@ export default async function JobDetailPage({ params }: PageProps) {
               className="h-16 w-16 flex-shrink-0 rounded-2xl object-cover"
             />
             <div>
-              {job.is_featured && (
-                <span className="mb-2 inline-block rounded-full bg-[var(--color-accent)] px-2.5 py-0.5 text-[11px] font-semibold text-[#3A2400]">
-                  Featured
-                </span>
+              {(job.is_featured || isJobHot(job.created_at)) && (
+                <div className="mb-2 flex gap-1.5">
+                  {job.is_featured && (
+                    <span className="inline-block rounded-full bg-[var(--color-accent)] px-2.5 py-0.5 text-[11px] font-semibold text-[#3A2400]">
+                      Featured
+                    </span>
+                  )}
+                  {isJobHot(job.created_at) && (
+                    <span className="inline-block rounded-full bg-orange-500 px-2.5 py-0.5 text-[11px] font-semibold text-white">
+                      🔥 Hot
+                    </span>
+                  )}
+                </div>
               )}
               <h1 className="font-[family-name:var(--font-display)] text-2xl font-semibold leading-tight text-[var(--color-ink)] sm:text-3xl">
                 {job.title}
@@ -160,6 +169,22 @@ export default async function JobDetailPage({ params }: PageProps) {
                 {job.description}
               </p>
             </section>
+
+            {job.tags?.length > 0 && (
+              <section>
+                <h2 className="text-lg font-semibold text-[var(--color-ink)]">Skill & Tags</h2>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {job.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full bg-[var(--color-bg)] px-3 py-1 text-sm font-medium text-[var(--color-muted)]"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </section>
+            )}
 
             {job.requirements?.length > 0 && (
               <section>

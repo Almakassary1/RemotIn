@@ -15,6 +15,14 @@ export function getExpiryCutoffISOString(): string {
   return new Date(Date.now() - JOB_EXPIRY_DAYS * 24 * 60 * 60 * 1000).toISOString()
 }
 
+// "HOT" = loker yang baru diposting dalam 24 jam terakhir — sinyal ke
+// pencari kerja bahwa ini kesempatan yang masih fresh, kompetisi pelamar
+// biasanya masih rendah. Dihitung dari created_at, nggak butuh data baru.
+export function isJobHot(createdAt: string): boolean {
+  const ageInHours = (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60)
+  return ageInHours <= 24
+}
+
 // Format tanggal relatif ("2 hari lalu") untuk JobCard — dipakai di
 // tampilan list, bukan halaman detail (yang tetap pakai tanggal absolut
 // lengkap supaya jelas kapan persisnya loker diposting).
@@ -73,6 +81,9 @@ export function buildJobPostingSchema(job: Job) {
       name: job.company_name,
       ...(job.company_logo ? { logo: job.company_logo } : {}),
     },
+    // Loker remote: pakai jobLocationType + applicantLocationRequirements,
+    // bukan jobLocation (alamat fisik) — ini yang direkomendasikan Google
+    // khusus untuk lowongan remote.
     jobLocationType: 'TELECOMMUTE',
     applicantLocationRequirements: {
       '@type': 'Country',

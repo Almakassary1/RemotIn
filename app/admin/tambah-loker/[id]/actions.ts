@@ -4,10 +4,9 @@ import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/lib/admin-auth'
 import { createAdminClient } from '@/utils/supabase/admin'
 
-interface AddJobResult {
+interface UpdateJobResult {
   success: boolean
   error?: string
-  jobId?: string
 }
 
 function isValidUrl(value: string): boolean {
@@ -44,17 +43,12 @@ function formatSalaryRange(min: string, max: string): string | null {
   return null
 }
 
-// Beda dari submitJob (app/post-job/actions.ts):
-// - Tidak ada honeypot / Turnstile — yang mengisi form ini sudah admin
-//   ter-otentikasi lewat cookie sesi, bukan pengguna publik anonim.
-// - is_approved di-set true langsung — loker tayang tanpa moderasi,
-//   karena ini adalah pintu masuk kurasi manual admin sendiri (dipakai
-//   juga di Fase B untuk isi 20-30 loker asli).
-// - Pakai createAdminClient() (service role), BUKAN client biasa, karena
-//   migration 04 memperketat RLS: insert publik hanya boleh dengan
-//   is_approved=false. Insert dengan is_approved=true harus lewat
-//   service role yang bypass RLS — sama seperti toggleApproved dkk.
-export async function addJob(formData: FormData): Promise<AddJobResult> {
+// Beda dari addJob (app/admin/tambah-loker/actions.ts): ini UPDATE baris yang
+// sudah ada (.eq('id', jobId)), bukan INSERT baris baru. is_approved dan
+// is_featured sengaja TIDAK disentuh di sini — dua status itu sudah punya
+// jalur sendiri (tombol Aktif/Nonaktif dan Featured/Standar di JobRow.tsx),
+// supaya tidak ada dua cara berbeda mengubah field yang sama.
+export async function updateJob(jobId: string, formData: FormData): Promise<UpdateJobResult> {
   await requireAdmin()
 
   const title = formData.get('title')?.toString().trim() ?? ''
@@ -71,10 +65,7 @@ export async function addJob(formData: FormData): Promise<AddJobResult> {
   const requirements = formData.get('requirements')?.toString() ?? ''
   const benefits = formData.get('benefits')?.toString() ?? ''
   const tags = formData.get('tags')?.toString() ?? ''
-  const isFeatured = formData.get('is_featured') === 'on'
 
-  // Validasi server-side — sama seperti submitJob, tetap divalidasi ulang
-  // di sini walau form sudah punya `required` di HTML.
   if (!title || !companyName || !categoryId || !jobType || !location || !applyUrl || !description) {
     return { success: false, error: 'Ada kolom wajib yang belum terisi.' }
   }
@@ -96,9 +87,9 @@ export async function addJob(formData: FormData): Promise<AddJobResult> {
 
   const supabase = createAdminClient()
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('jobs')
-    .insert({
+    .update({
       title,
       company_name: companyName,
       company_logo: companyLogo || null,
@@ -114,20 +105,17 @@ export async function addJob(formData: FormData): Promise<AddJobResult> {
       requirements: linesToArray(requirements),
       benefits: linesToArray(benefits),
       tags: commaToArray(tags),
-      is_approved: true,
-      is_featured: isFeatured,
     })
-    .select('id')
-    .single()
+    .eq('id', jobId)
 
   if (error) {
-    console.error('Gagal menambah loker (admin):', error.message)
-    return { success: false, error: 'Gagal menyimpan loker. Silakan coba lagi.' }
+    console.error('Gagal update loker (admin):', error.message)
+    return { success: false, error: 'Gagal menyimpan perubahan. Silakan coba lagi.' }
   }
 
   revalidatePath('/admin')
   revalidatePath('/')
   revalidatePath('/jobs/[id]', 'page')
 
-  return { success: true, jobId: data.id }
+  return { success: true }
 }

@@ -30,6 +30,8 @@ export interface Job {
   // Ditambahkan untuk Halaman Detail Loker — lihat 02_add_requirements_benefits.sql
   requirements: string[]
   benefits: string[]
+  // Skill tags berwarna di kartu loker — lihat 08_job_tags.sql
+  tags: string[]
   // Data hasil join dari tabel categories (lihat query `*, categories(*)` di app/page.tsx)
   categories?: Category | null
 }

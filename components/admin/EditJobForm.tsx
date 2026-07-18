@@ -19,6 +19,9 @@ const inputClass =
   'w-full rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-2.5 text-sm text-[var(--color-ink)] outline-none transition placeholder:text-[var(--color-muted)]/70 focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/15'
 const labelClass = 'mb-1.5 block text-sm font-medium text-[var(--color-ink)]'
 
+// Ubah data Job (dari database) jadi bentuk form yang bisa diedit —
+// kebalikan dari yang dilakukan actions.ts saat submit (array -> string
+// per baris, number -> string buat input).
 function jobToFormState(job: Job) {
   return {
     title: job.title,
@@ -34,6 +37,7 @@ function jobToFormState(job: Job) {
     description: job.description,
     requirements: (job.requirements ?? []).join('\n'),
     benefits: (job.benefits ?? []).join('\n'),
+    tags: (job.tags ?? []).join(', '),
   }
 }
 
@@ -91,6 +95,7 @@ export default function EditJobForm({ job, categories }: EditJobFormProps) {
           onSubmit={handleSubmit}
           className="mt-8 flex flex-col gap-6 rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 sm:p-8"
         >
+          {/* Posisi & Perusahaan */}
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
               <label className={labelClass} htmlFor="title">
@@ -124,6 +129,7 @@ export default function EditJobForm({ job, categories }: EditJobFormProps) {
             </div>
           </div>
 
+          {/* Logo & Lokasi */}
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
               <label className={labelClass} htmlFor="company_logo">
@@ -155,6 +161,7 @@ export default function EditJobForm({ job, categories }: EditJobFormProps) {
             </div>
           </div>
 
+          {/* Kategori */}
           <div>
             <label className={labelClass} htmlFor="category_id">
               Kategori Pekerjaan *
@@ -181,6 +188,7 @@ export default function EditJobForm({ job, categories }: EditJobFormProps) {
             </div>
           </div>
 
+          {/* Tipe Pekerjaan */}
           <div>
             <span className={labelClass}>Tipe Pekerjaan *</span>
             <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Tipe Pekerjaan">
@@ -202,6 +210,7 @@ export default function EditJobForm({ job, categories }: EditJobFormProps) {
             </div>
           </div>
 
+          {/* Susunan Kerja */}
           <div>
             <span className={labelClass}>Susunan Kerja *</span>
             <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Susunan Kerja">
@@ -223,6 +232,7 @@ export default function EditJobForm({ job, categories }: EditJobFormProps) {
             </div>
           </div>
 
+          {/* Gaji */}
           <div>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <div>
@@ -263,6 +273,7 @@ export default function EditJobForm({ job, categories }: EditJobFormProps) {
             </p>
           </div>
 
+          {/* Apply URL */}
           <div>
             <label className={labelClass} htmlFor="apply_url">
               Link Form Lamaran / Email *
@@ -279,6 +290,7 @@ export default function EditJobForm({ job, categories }: EditJobFormProps) {
             />
           </div>
 
+          {/* Deskripsi */}
           <div>
             <label className={labelClass} htmlFor="description">
               Deskripsi Pekerjaan *
@@ -295,6 +307,7 @@ export default function EditJobForm({ job, categories }: EditJobFormProps) {
             />
           </div>
 
+          {/* Requirements */}
           <div>
             <label className={labelClass} htmlFor="requirements">
               Persyaratan / Kualifikasi
@@ -311,6 +324,7 @@ export default function EditJobForm({ job, categories }: EditJobFormProps) {
             />
           </div>
 
+          {/* Benefits */}
           <div>
             <label className={labelClass} htmlFor="benefits">
               Benefit / Fasilitas
@@ -325,6 +339,25 @@ export default function EditJobForm({ job, categories }: EditJobFormProps) {
               placeholder={'Satu poin per baris'}
               className={`${inputClass} resize-y`}
             />
+          </div>
+
+          {/* Tags */}
+          <div>
+            <label className={labelClass} htmlFor="tags">
+              Skill / Tags
+            </label>
+            <input
+              id="tags"
+              name="tags"
+              type="text"
+              value={form.tags}
+              onChange={(e) => update('tags', e.target.value)}
+              placeholder="Pisahkan dengan koma, mis: React, Node.js, B2B SaaS"
+              className={inputClass}
+            />
+            <p className="mt-1.5 text-xs text-[var(--color-muted)]">
+              Opsional — muncul sebagai tag kecil di kartu loker.
+            </p>
           </div>
 
           <button

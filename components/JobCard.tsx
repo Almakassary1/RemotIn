@@ -1,22 +1,32 @@
 import Link from 'next/link'
 import { Briefcase, Wallet, ArrowRight, Clock, Building2 } from 'lucide-react'
-import { formatRelativeDate } from '@/lib/job-utils'
+import { formatRelativeDate, isJobHot } from '@/lib/job-utils'
 import type { Job } from '@/lib/types'
 
 export default function JobCard({ job }: { job: Job }) {
   const fallbackLogo = `https://ui-avatars.com/api/?name=${encodeURIComponent(
     job.company_name
   )}&background=0E6E5B&color=fff`
+  const hot = isJobHot(job.created_at)
 
   return (
     <Link
       href={`/jobs/${job.id}`}
       className="group relative flex flex-col gap-4 rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-5 transition hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-8px_rgba(14,110,91,0.25)] sm:flex-row sm:items-center sm:gap-6"
     >
-      {job.is_featured && (
-        <span className="absolute -top-2.5 left-5 rounded-full bg-[var(--color-accent)] px-2.5 py-0.5 text-[11px] font-semibold text-[#3A2400] shadow-sm">
-          Featured
-        </span>
+      {(job.is_featured || hot) && (
+        <div className="absolute -top-2.5 left-5 flex gap-1.5">
+          {job.is_featured && (
+            <span className="rounded-full bg-[var(--color-accent)] px-2.5 py-0.5 text-[11px] font-semibold text-[#3A2400] shadow-sm">
+              Featured
+            </span>
+          )}
+          {hot && (
+            <span className="rounded-full bg-orange-500 px-2.5 py-0.5 text-[11px] font-semibold text-white shadow-sm">
+              🔥 Hot
+            </span>
+          )}
+        </div>
       )}
 
       {/* Logo perusahaan */}
@@ -62,6 +72,19 @@ export default function JobCard({ job }: { job: Job }) {
             {formatRelativeDate(job.created_at)}
           </span>
         </div>
+
+        {job.tags.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {job.tags.map((tag) => (
+              <span
+                key={tag}
+                className="rounded-full bg-[var(--color-bg)] px-2 py-0.5 text-[11px] font-medium text-[var(--color-muted)]"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* CTA */}

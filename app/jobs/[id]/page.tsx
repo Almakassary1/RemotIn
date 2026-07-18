@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, Briefcase, Wallet, CalendarDays, Layers, Building2 } from 'lucide-react'
 import { FaWhatsapp } from 'react-icons/fa'
+import SaveJobButton from '@/components/SaveJobButton'
 import { createClient } from '@/utils/supabase/server'
 import { getExpiryCutoffISOString, buildJobPostingSchema, isJobHot } from '@/lib/job-utils'
 import { SITE_URL } from '@/lib/site-config'
@@ -289,6 +290,8 @@ export default async function JobDetailPage({ params }: PageProps) {
             >
               Lamar Sekarang
             </a>
+
+            <SaveJobButton jobId={job.id} />
 
             <a
               href={whatsappShareUrl}

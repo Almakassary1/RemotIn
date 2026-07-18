@@ -8,6 +8,7 @@ import { Menu, X } from 'lucide-react'
 const NAV_LINKS = [
   { label: 'Cari Loker', href: '/' },
   { label: 'Kategori', href: '/#kategori' },
+  { label: 'Tersimpan', href: '/tersimpan' },
 ]
 
 export default function Navbar() {

@@ -5,6 +5,7 @@ import { Search } from 'lucide-react'
 import type { Job, Category, JobType, WorkArrangement } from '@/lib/types'
 import FilterBar from './FilterBar'
 import JobCard from './JobCard'
+import Sidebar from './Sidebar'
 
 export type SortOption = 'newest' | 'salary'
 
@@ -87,6 +88,13 @@ export default function JobBoard({
   const visibleJobs = sortedJobs.slice(0, visibleCount)
   const hasMore = visibleCount < sortedJobs.length
 
+  // Dihitung dari initialJobs (bukan hasil filter) supaya angkanya stabil
+  // sebagai gambaran keseluruhan RemotIn, nggak berubah-ubah tiap user ganti filter.
+  const totalCompanies = useMemo(
+    () => new Set(initialJobs.map((job) => job.company_name)).size,
+    [initialJobs]
+  )
+
   return (
     <main className="min-h-screen bg-[var(--color-bg)]">
       {/* ===== Hero Section ===== */}
@@ -116,43 +124,50 @@ export default function JobBoard({
         </div>
       </section>
 
-      {/* ===== Filter + Job List ===== */}
-      <section id="kategori" className="mx-auto max-w-3xl scroll-mt-24 px-6 pb-24">
-        <FilterBar
-          categories={categories}
-          activeCategory={activeCategory}
-          onCategoryChange={setActiveCategory}
-          activeJobType={activeJobType}
-          onJobTypeChange={setActiveJobType}
-          activeWorkArrangement={activeWorkArrangement}
-          onWorkArrangementChange={setActiveWorkArrangement}
-          minSalary={minSalary}
-          onMinSalaryChange={setMinSalary}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          resultCount={sortedJobs.length}
-        />
+      {/* ===== Filter + Job List + Sidebar ===== */}
+      <section id="kategori" className="mx-auto max-w-6xl scroll-mt-24 px-6 pb-24">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
+          {/* Konten utama */}
+          <div className="min-w-0">
+            <FilterBar
+              categories={categories}
+              activeCategory={activeCategory}
+              onCategoryChange={setActiveCategory}
+              activeJobType={activeJobType}
+              onJobTypeChange={setActiveJobType}
+              activeWorkArrangement={activeWorkArrangement}
+              onWorkArrangementChange={setActiveWorkArrangement}
+              minSalary={minSalary}
+              onMinSalaryChange={setMinSalary}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+              resultCount={sortedJobs.length}
+            />
 
-        <div className="mt-6 flex flex-col gap-3">
-          {sortedJobs.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-[var(--color-line)] py-16 text-center text-sm text-[var(--color-muted)]">
-              Belum ada loker yang cocok. Coba ubah filter atau kata kunci pencarian.
+            <div className="mt-6 flex flex-col gap-3">
+              {sortedJobs.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-[var(--color-line)] py-16 text-center text-sm text-[var(--color-muted)]">
+                  Belum ada loker yang cocok. Coba ubah filter atau kata kunci pencarian.
+                </div>
+              ) : (
+                visibleJobs.map((job) => <JobCard key={job.id} job={job} />)
+              )}
             </div>
-          ) : (
-            visibleJobs.map((job) => <JobCard key={job.id} job={job} />)
-          )}
-        </div>
 
-        {hasMore && (
-          <div className="mt-6 flex justify-center">
-            <button
-              onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
-              className="rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-6 py-2.5 text-sm font-medium text-[var(--color-ink)] transition hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
-            >
-              Muat Lebih Banyak ({sortedJobs.length - visibleCount} lagi)
-            </button>
+            {hasMore && (
+              <div className="mt-6 flex justify-center">
+                <button
+                  onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
+                  className="rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-6 py-2.5 text-sm font-medium text-[var(--color-ink)] transition hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+                >
+                  Muat Lebih Banyak ({sortedJobs.length - visibleCount} lagi)
+                </button>
+              </div>
+            )}
           </div>
-        )}
+
+          <Sidebar totalJobs={initialJobs.length} totalCompanies={totalCompanies} />
+        </div>
       </section>
     </main>
   )

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, Briefcase, Wallet, CalendarDays, Layers, Building2 } from 'lucide-react'
+import { FaWhatsapp } from 'react-icons/fa'
 import { createClient } from '@/utils/supabase/server'
 import { getExpiryCutoffISOString, buildJobPostingSchema } from '@/lib/job-utils'
 import { SITE_URL } from '@/lib/site-config'
@@ -77,6 +78,9 @@ export default async function JobDetailPage({ params }: PageProps) {
     month: 'long',
     year: 'numeric',
   })
+
+  const shareText = `Loker ${job.title} di ${job.company_name} — cek di RemotIn: ${SITE_URL}/jobs/${job.id}`
+  const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`
 
   return (
     <main className="min-h-screen bg-[var(--color-bg)]">
@@ -259,6 +263,16 @@ export default async function JobDetailPage({ params }: PageProps) {
               className="rounded-full border border-[var(--color-primary)] px-6 py-3 text-center text-sm font-medium text-[var(--color-primary)] transition hover:bg-[var(--color-primary)] hover:text-white"
             >
               Lamar Sekarang
+            </a>
+
+            <a
+              href={whatsappShareUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-[var(--color-line)] px-6 py-3 text-sm font-medium text-[var(--color-ink)] transition hover:border-[#25D366] hover:text-[#25D366]"
+            >
+              <FaWhatsapp className="h-4 w-4" />
+              Bagikan ke WhatsApp
             </a>
           </aside>
         </div>

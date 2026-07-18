@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { Search } from 'lucide-react'
-import type { Job, Category, JobType } from '@/lib/types'
+import type { Job, Category, JobType, WorkArrangement } from '@/lib/types'
 import FilterBar from './FilterBar'
 import JobCard from './JobCard'
 
@@ -29,6 +29,8 @@ export default function JobBoard({
   const [query, setQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState<string | null>(initialCategorySlug)
   const [activeJobType, setActiveJobType] = useState<JobType | null>(null)
+  const [activeWorkArrangement, setActiveWorkArrangement] = useState<WorkArrangement | null>(null)
+  const [minSalary, setMinSalary] = useState(0)
   const [sortBy, setSortBy] = useState<SortOption>('newest')
 
   // Filtering dilakukan di client karena data sudah di-fetch sekaligus dari server.
@@ -45,10 +47,17 @@ export default function JobBoard({
 
       const matchesCategory = activeCategory === null || job.categories?.slug === activeCategory
       const matchesJobType = activeJobType === null || job.job_type === activeJobType
+      const matchesWorkArrangement =
+        activeWorkArrangement === null || job.work_arrangement === activeWorkArrangement
+      // Loker tanpa gaji dicantumkan (salary_max & salary_min null) otomatis
+      // tersembunyi begitu minSalary > 0 — nggak ada cara pastikan mereka
+      // qualify, jadi lebih aman dianggap tidak memenuhi filter.
+      const matchesSalary =
+        minSalary === 0 || (job.salary_max ?? job.salary_min ?? 0) >= minSalary
 
-      return matchesQuery && matchesCategory && matchesJobType
+      return matchesQuery && matchesCategory && matchesJobType && matchesWorkArrangement && matchesSalary
     })
-  }, [initialJobs, query, activeCategory, activeJobType])
+  }, [initialJobs, query, activeCategory, activeJobType, activeWorkArrangement, minSalary])
 
   // "newest" sengaja tidak di-sort ulang di sini — initialJobs sudah datang
   // dari server dalam urutan featured dulu, lalu created_at terbaru (lihat
@@ -101,6 +110,10 @@ export default function JobBoard({
           onCategoryChange={setActiveCategory}
           activeJobType={activeJobType}
           onJobTypeChange={setActiveJobType}
+          activeWorkArrangement={activeWorkArrangement}
+          onWorkArrangementChange={setActiveWorkArrangement}
+          minSalary={minSalary}
+          onMinSalaryChange={setMinSalary}
           sortBy={sortBy}
           onSortChange={setSortBy}
           resultCount={sortedJobs.length}

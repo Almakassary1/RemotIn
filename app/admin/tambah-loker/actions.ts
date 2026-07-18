@@ -55,6 +55,7 @@ export async function addJob(formData: FormData): Promise<AddJobResult> {
   const companyLogo = formData.get('company_logo')?.toString().trim() ?? ''
   const categoryId = formData.get('category_id')?.toString() ?? ''
   const jobType = formData.get('job_type')?.toString() ?? ''
+  const workArrangement = formData.get('work_arrangement')?.toString() || 'Full Remote'
   const location = formData.get('location')?.toString().trim() || 'Remote - Indonesia'
   const salaryMin = formData.get('salary_min')?.toString() ?? ''
   const salaryMax = formData.get('salary_max')?.toString() ?? ''
@@ -71,6 +72,9 @@ export async function addJob(formData: FormData): Promise<AddJobResult> {
   }
   if (!isValidUrl(applyUrl)) {
     return { success: false, error: 'Link Form Lamaran / Email harus berupa URL yang valid.' }
+  }
+  if (workArrangement !== 'Full Remote' && workArrangement !== 'Hybrid') {
+    return { success: false, error: 'Susunan kerja tidak valid.' }
   }
   if (companyLogo && !isValidUrl(companyLogo)) {
     return { success: false, error: 'URL Logo Perusahaan tidak valid.' }
@@ -92,6 +96,7 @@ export async function addJob(formData: FormData): Promise<AddJobResult> {
       company_logo: companyLogo || null,
       category_id: categoryId || null,
       job_type: jobType,
+      work_arrangement: workArrangement,
       location,
       salary_range: formatSalaryRange(salaryMin, salaryMax),
       salary_min: salaryMin ? Number(salaryMin) : null,

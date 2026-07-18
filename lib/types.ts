@@ -8,6 +8,8 @@ export interface Category {
 
 export type JobType = 'Full-time' | 'Part-time' | 'Contract' | 'Freelance'
 
+export type WorkArrangement = 'Full Remote' | 'Hybrid'
+
 export interface Job {
   id: string
   title: string
@@ -15,6 +17,7 @@ export interface Job {
   company_logo: string | null
   location: string
   job_type: JobType
+  work_arrangement: WorkArrangement
   category_id: string | null
   salary_range: string | null
   description: string

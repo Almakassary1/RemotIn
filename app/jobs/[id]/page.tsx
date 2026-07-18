@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, Briefcase, Wallet, CalendarDays, Layers } from 'lucide-react'
+import { ArrowLeft, Briefcase, Wallet, CalendarDays, Layers, Building2 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/server'
 import { getExpiryCutoffISOString, buildJobPostingSchema } from '@/lib/job-utils'
 import { SITE_URL } from '@/lib/site-config'
@@ -213,6 +213,15 @@ export default async function JobDetailPage({ params }: PageProps) {
                   <div>
                     <dt className="text-xs text-[var(--color-muted)]">Tipe Pekerjaan</dt>
                     <dd className="text-sm font-medium text-[var(--color-ink)]">{job.job_type}</dd>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Building2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-[var(--color-primary)]" />
+                  <div>
+                    <dt className="text-xs text-[var(--color-muted)]">Susunan Kerja</dt>
+                    <dd className="text-sm font-medium text-[var(--color-ink)]">
+                      {job.work_arrangement}
+                    </dd>
                   </div>
                 </div>
                 {job.categories && (

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Briefcase, Wallet, ArrowRight, Clock } from 'lucide-react'
+import { Briefcase, Wallet, ArrowRight, Clock, Building2 } from 'lucide-react'
 import { formatRelativeDate } from '@/lib/job-utils'
 import type { Job } from '@/lib/types'
 
@@ -34,6 +34,12 @@ export default function JobCard({ job }: { job: Job }) {
         <p className="mt-0.5 text-sm text-[var(--color-muted)]">{job.company_name}</p>
 
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[var(--color-muted)]">
+          {job.work_arrangement === 'Hybrid' && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-accent)]/20 px-2 py-0.5 text-[11px] font-medium text-[#6B4200]">
+              <Building2 className="h-3 w-3" />
+              Hybrid
+            </span>
+          )}
           <span className="inline-flex items-center gap-1.5">
             <span className="relative flex h-1.5 w-1.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-primary)] opacity-60" />

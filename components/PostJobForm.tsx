@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Loader2, ChevronDown, CheckCircle2 } from 'lucide-react'
 import { submitJob } from '@/app/post-job/actions'
-import type { Category, JobType } from '@/lib/types'
+import type { Category, JobType, WorkArrangement } from '@/lib/types'
 import Toast from './Toast'
 import TurnstileWidget from './TurnstileWidget'
 import FeaturedUpsell from './FeaturedUpsell'
@@ -14,6 +14,7 @@ interface PostJobFormProps {
 }
 
 const JOB_TYPES: JobType[] = ['Full-time', 'Part-time', 'Contract', 'Freelance']
+const WORK_ARRANGEMENTS: WorkArrangement[] = ['Full Remote', 'Hybrid']
 
 const initialForm = {
   title: '',
@@ -21,6 +22,7 @@ const initialForm = {
   company_logo: '',
   category_id: '',
   job_type: 'Full-time' as JobType,
+  work_arrangement: 'Full Remote' as WorkArrangement,
   location: 'Remote - Indonesia',
   salary_min: '',
   salary_max: '',
@@ -261,6 +263,28 @@ export default function PostJobForm({ categories }: PostJobFormProps) {
                   />
                   <span className="block rounded-full border border-[var(--color-line)] px-4 py-2 text-sm font-medium text-[var(--color-muted)] transition peer-checked:border-[var(--color-primary)] peer-checked:bg-[var(--color-primary)] peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--color-primary)] peer-focus-visible:ring-offset-2">
                     {type}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Susunan Kerja */}
+          <div>
+            <span className={labelClass}>Susunan Kerja *</span>
+            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Susunan Kerja">
+              {WORK_ARRANGEMENTS.map((arrangement) => (
+                <label key={arrangement} className="cursor-pointer">
+                  <input
+                    type="radio"
+                    name="work_arrangement"
+                    value={arrangement}
+                    checked={form.work_arrangement === arrangement}
+                    onChange={() => update('work_arrangement', arrangement)}
+                    className="peer sr-only"
+                  />
+                  <span className="block rounded-full border border-[var(--color-line)] px-4 py-2 text-sm font-medium text-[var(--color-muted)] transition peer-checked:border-[var(--color-primary)] peer-checked:bg-[var(--color-primary)] peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--color-primary)] peer-focus-visible:ring-offset-2">
+                    {arrangement}
                   </span>
                 </label>
               ))}

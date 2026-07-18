@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Star, CheckCircle2, XCircle, Trash2, Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { Star, CheckCircle2, XCircle, Trash2, Loader2, Pencil } from 'lucide-react'
 import { toggleApproved, toggleFeatured, deleteJob } from '@/app/admin/actions'
 import { isJobExpired } from '@/lib/job-utils'
 import type { Job } from '@/lib/types'
@@ -55,8 +56,6 @@ export default function JobRow({ job, isPaid }: { job: Job; isPaid: boolean }) {
     })
   }
 
-  // Feedback optimistik: begitu berhasil dihapus, langsung hilang dari
-  // tampilan tanpa menunggu revalidatePath selesai streaming ulang.
   if (deleted) return null
 
   return (
@@ -118,19 +117,29 @@ export default function JobRow({ job, isPaid }: { job: Job; isPaid: boolean }) {
         </div>
       </td>
       <td className={cellClass}>
-        <button
-          onClick={handleDelete}
-          disabled={isPending}
-          aria-label={`Hapus loker ${job.title}`}
-          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {isPending ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <Trash2 className="h-3.5 w-3.5" />
-          )}
-          Hapus
-        </button>
+        <div className="flex items-center gap-1">
+          <Link
+            href={`/admin/edit-loker/${job.id}`}
+            aria-label={`Edit loker ${job.title}`}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-[var(--color-muted)] transition hover:bg-[var(--color-bg)] hover:text-[var(--color-primary)]"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+            Edit
+          </Link>
+          <button
+            onClick={handleDelete}
+            disabled={isPending}
+            aria-label={`Hapus loker ${job.title}`}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isPending ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Trash2 className="h-3.5 w-3.5" />
+            )}
+            Hapus
+          </button>
+        </div>
       </td>
     </tr>
   )

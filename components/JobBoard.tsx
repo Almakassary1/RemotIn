@@ -1,12 +1,14 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Search } from 'lucide-react'
 import type { Job, Category, JobType, WorkArrangement } from '@/lib/types'
 import FilterBar from './FilterBar'
 import JobCard from './JobCard'
 
 export type SortOption = 'newest' | 'salary'
+
+const PAGE_SIZE = 10
 
 interface JobBoardProps {
   initialJobs: Job[]
@@ -73,6 +75,18 @@ export default function JobBoard({
     })
   }, [filteredJobs, sortBy])
 
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+
+  // Setiap kali filter/sort berubah, balik ke halaman pertama — supaya
+  // hasil "Muat Lebih Banyak" dari pencarian sebelumnya nggak nyangkut
+  // dan bikin bingung ("kok cuma 2 dari 30 loker yang muncul?").
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE)
+  }, [query, activeCategory, activeJobType, activeWorkArrangement, minSalary, sortBy])
+
+  const visibleJobs = sortedJobs.slice(0, visibleCount)
+  const hasMore = visibleCount < sortedJobs.length
+
   return (
     <main className="min-h-screen bg-[var(--color-bg)]">
       {/* ===== Hero Section ===== */}
@@ -125,9 +139,20 @@ export default function JobBoard({
               Belum ada loker yang cocok. Coba ubah filter atau kata kunci pencarian.
             </div>
           ) : (
-            sortedJobs.map((job) => <JobCard key={job.id} job={job} />)
+            visibleJobs.map((job) => <JobCard key={job.id} job={job} />)
           )}
         </div>
+
+        {hasMore && (
+          <div className="mt-6 flex justify-center">
+            <button
+              onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
+              className="rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-6 py-2.5 text-sm font-medium text-[var(--color-ink)] transition hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+            >
+              Muat Lebih Banyak ({sortedJobs.length - visibleCount} lagi)
+            </button>
+          </div>
+        )}
       </section>
     </main>
   )

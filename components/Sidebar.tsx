@@ -46,9 +46,9 @@ export default function Sidebar({ totalJobs, totalCompanies }: SidebarProps) {
         </p>
 
         {subscribed ? (
-          <p className="mt-3 flex items-center gap-1.5 text-sm font-medium text-[var(--color-primary)]">
-            <CheckCircle2 className="h-4 w-4" />
-            Terdaftar! Terima kasih.
+          <p className="mt-3 flex items-start gap-1.5 text-sm font-medium text-[var(--color-primary)]">
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+            Cek inbox kamu — klik link konfirmasi buat mulai terima update loker.
           </p>
         ) : (
           <form onSubmit={handleSubscribe} className="mt-3 flex flex-col gap-2">

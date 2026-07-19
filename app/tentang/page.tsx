@@ -61,8 +61,8 @@ export default function AboutPage() {
             <h2 className="text-lg font-semibold text-[var(--color-ink)]">Model layanan kami</h2>
             <p className="mt-2">
               RemotIn 100% gratis untuk pencari kerja, selamanya. Perusahaan dan recruiter juga
-              bisa memasang loker secara gratis; ke depannya kami akan menawarkan opsi
-              &quot;Featured&quot; berbayar bagi yang ingin lokernya lebih menonjol.
+              bisa memasang loker secara gratis, dengan opsi upgrade &quot;Featured&quot;
+              berbayar buat yang ingin lokernya lebih menonjol di daftar pencarian.
             </p>
           </section>
         </div>
@@ -70,13 +70,13 @@ export default function AboutPage() {
         <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/"
-            className="rounded-full bg-[var(--color-primary)] px-6 py-3 text-center text-sm font-medium text-white transition hover:bg-[#0A5347]"
+            className="rounded-full bg-[var(--color-primary)] px-6 py-3 text-center text-sm font-medium tracking-wide text-white shadow-[0_4px_14px_-2px_rgba(14,110,91,0.4)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#0A5347] hover:shadow-[0_6px_18px_-2px_rgba(14,110,91,0.5)] active:translate-y-0 active:scale-[0.98]"
           >
             Cari Loker
           </Link>
           <Link
             href="/post-job"
-            className="rounded-full border border-[var(--color-line)] px-6 py-3 text-center text-sm font-medium text-[var(--color-ink)] transition hover:border-[var(--color-primary)]"
+            className="rounded-full border border-[var(--color-line)] px-6 py-3 text-center text-sm font-medium tracking-wide text-[var(--color-ink)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--color-primary)] hover:shadow-[0_4px_14px_-2px_rgba(14,110,91,0.2)] active:translate-y-0 active:scale-[0.98]"
           >
             Pasang Loker
           </Link>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { Mail, MessageCircle } from 'lucide-react'
+import Link from 'next/link'
+import { Mail, MessageCircle, HelpCircle } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Kontak — RemotIn',
@@ -27,6 +28,25 @@ export default function ContactPage() {
         </a>
 
         <div className="mt-10 rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 text-left">
+          <div className="flex items-start gap-3">
+            <HelpCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-[var(--color-primary)]" />
+            <div>
+              <h2 className="text-sm font-semibold text-[var(--color-ink)]">
+                Cek FAQ dulu, mungkin sudah ada jawabannya
+              </h2>
+              <p className="mt-1 text-sm text-[var(--color-muted)]">
+                Pertanyaan umum soal cara pasang loker, biaya, atau cara melamar sudah dijawab di
+                halaman{' '}
+                <Link href="/faq" className="text-[var(--color-primary)] underline underline-offset-2">
+                  FAQ
+                </Link>
+                .
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 text-left">
           <div className="flex items-start gap-3">
             <MessageCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-[var(--color-primary)]" />
             <div>

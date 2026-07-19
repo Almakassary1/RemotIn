@@ -9,6 +9,7 @@ const QUICK_LINKS = [
   { label: 'Cari Loker', href: '/' },
   { label: 'Kategori', href: '/#kategori' },
   { label: 'Pasang Loker', href: '/post-job' },
+  { label: 'FAQ', href: '/faq' },
   { label: 'Tentang Kami', href: '/tentang' },
   { label: 'Kontak', href: '/kontak' },
 ]

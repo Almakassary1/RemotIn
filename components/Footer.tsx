@@ -28,7 +28,7 @@ export default function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="bg-[var(--color-ink)]">
+    <footer className="bg-[var(--color-primary)]">
       <div className="mx-auto max-w-6xl px-6 py-14">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-3">
           {/* Brand */}
@@ -38,7 +38,7 @@ export default function Footer() {
                 <img src="/logo-mark.svg" alt="RemotIn" className="h-5 w-5" />
               </span>
               <span className="font-[family-name:var(--font-display)] text-lg font-semibold text-[#F7F5F0]">
-                Remot<span className="text-emerald-400">In</span>
+                Remot<span className="text-[var(--color-accent)]">In</span>
               </span>
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-[#F7F5F0]/60">
@@ -49,21 +49,21 @@ export default function Footer() {
               <a
                 href="#"
                 aria-label="Instagram"
-                className="text-[#F7F5F0]/50 transition hover:text-emerald-400"
+                className="text-[#F7F5F0]/50 transition hover:text-[var(--color-accent)]"
               >
                 <FaInstagram className="h-4 w-4" />
               </a>
               <a
                 href="#"
                 aria-label="LinkedIn"
-                className="text-[#F7F5F0]/50 transition hover:text-emerald-400"
+                className="text-[#F7F5F0]/50 transition hover:text-[var(--color-accent)]"
               >
                 <FaLinkedin className="h-4 w-4" />
               </a>
               <a
                 href="mailto:hello@remotinjobs.com"
                 aria-label="Email"
-                className="text-[#F7F5F0]/50 transition hover:text-emerald-400"
+                className="text-[#F7F5F0]/50 transition hover:text-[var(--color-accent)]"
               >
                 <Mail className="h-4 w-4" />
               </a>
@@ -80,7 +80,7 @@ export default function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm text-[#F7F5F0]/70 transition hover:text-emerald-400"
+                    className="text-sm text-[#F7F5F0]/70 transition hover:text-[var(--color-accent)]"
                   >
                     {link.label}
                   </Link>
@@ -99,7 +99,7 @@ export default function Footer() {
                 <li key={cat.href}>
                   <Link
                     href={cat.href}
-                    className="text-sm text-[#F7F5F0]/70 transition hover:text-emerald-400"
+                    className="text-sm text-[#F7F5F0]/70 transition hover:text-[var(--color-accent)]"
                   >
                     {cat.label}
                   </Link>

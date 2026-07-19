@@ -64,7 +64,7 @@ export default function Navbar({ userEmail }: NavbarProps) {
           ))}
           <Link
             href="/post-job"
-            className="rounded-full bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#0A5347] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2"
+            className="rounded-full bg-[var(--color-primary)] px-4 py-2 text-sm font-medium tracking-wide text-white shadow-[0_3px_10px_-2px_rgba(14,110,91,0.4)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#0A5347] hover:shadow-[0_5px_14px_-2px_rgba(14,110,91,0.5)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2"
           >
             + Pasang Loker
           </Link>

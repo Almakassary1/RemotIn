@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
 import { Search } from 'lucide-react'
 import type { Job, Category, JobType, WorkArrangement } from '@/lib/types'
 import FilterBar from './FilterBar'
@@ -98,29 +99,83 @@ export default function JobBoard({
   return (
     <main className="min-h-screen bg-[var(--color-bg)]">
       {/* ===== Hero Section ===== */}
-      <section className="mx-auto max-w-3xl px-6 pb-10 pt-16 text-center sm:pt-24">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-3 py-1 text-xs font-medium text-[var(--color-muted)]">
-          <span className="relative flex h-1.5 w-1.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-primary)] opacity-60" />
-            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[var(--color-primary)]" />
-          </span>
-          {initialJobs.length} loker remote aktif hari ini
-        </span>
+      {/* Teal solid, bukan lagi cream — ini identitas RemotIn yang ditegaskan,
+          bukan cuma jadi warna aksen kecil. Kartu loker melayang di sisi kanan
+          (desktop) pakai loker asli teratas (biasanya Featured, karena
+          initialJobs sudah di-sort is_featured dulu di app/page.tsx) — bukan
+          ilustrasi dekoratif, biar kelihatan produknya beneran, bukan hiasan. */}
+      <section className="bg-[var(--color-primary)]">
+        <div className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
+          <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1fr_300px]">
+            <div className="text-center lg:text-left">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-white/80">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-accent)] opacity-60" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" />
+                </span>
+                {initialJobs.length} loker remote aktif hari ini
+              </span>
 
-        <h1 className="mt-5 font-[family-name:var(--font-display)] text-4xl font-medium leading-tight text-[var(--color-ink)] sm:text-5xl">
-          {heroTitle}
-        </h1>
-        <p className="mt-4 text-base text-[var(--color-muted)] sm:text-lg">{heroSubtitle}</p>
+              <h1 className="mt-5 font-[family-name:var(--font-display)] text-4xl font-medium leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-[3.25rem]">
+                {heroTitle}
+              </h1>
+              <p className="mx-auto mt-4 max-w-md text-base text-[#9FE1CB] sm:text-lg lg:mx-0">
+                {heroSubtitle}
+              </p>
 
-        <div className="mx-auto mt-8 flex max-w-lg items-center gap-2 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] p-1.5 pl-4 shadow-sm">
-          <Search className="h-4 w-4 flex-shrink-0 text-[var(--color-muted)]" />
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Cari posisi atau nama perusahaan..."
-            className="w-full bg-transparent text-sm text-[var(--color-ink)] outline-none placeholder:text-[var(--color-muted)]"
-          />
+              <div className="mx-auto mt-8 flex max-w-lg items-center gap-2 rounded-full bg-white p-1.5 pl-4 shadow-lg lg:mx-0">
+                <Search className="h-4 w-4 flex-shrink-0 text-[var(--color-muted)]" />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Cari posisi atau nama perusahaan..."
+                  className="w-full bg-transparent text-sm text-[var(--color-ink)] outline-none placeholder:text-[var(--color-muted)]"
+                />
+              </div>
+            </div>
+
+            {initialJobs[0] && (
+              <div className="hidden lg:block">
+                <div className="relative mx-auto w-56 -rotate-3">
+                  <div
+                    aria-hidden="true"
+                    className="absolute inset-0 translate-x-2 translate-y-2 rounded-2xl bg-black/15"
+                  />
+                  <Link
+                    href={`/jobs/${initialJobs[0].id}`}
+                    className="relative block rounded-2xl bg-white p-4 shadow-xl transition hover:-translate-y-1"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      {initialJobs[0].company_logo ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={initialJobs[0].company_logo}
+                          alt=""
+                          className="h-9 w-9 shrink-0 rounded-lg object-contain"
+                        />
+                      ) : (
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-accent)] text-xs font-semibold text-[#412402]">
+                          {initialJobs[0].company_name.slice(0, 2).toUpperCase()}
+                        </span>
+                      )}
+                      <div className="min-w-0">
+                        <p className="truncate text-xs font-semibold text-[var(--color-ink)]">
+                          {initialJobs[0].title}
+                        </p>
+                        <p className="truncate text-[11px] text-[var(--color-muted)]">
+                          {initialJobs[0].company_name}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="mt-2.5 text-[11px] text-[var(--color-muted)]">
+                      {initialJobs[0].location}
+                    </p>
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 

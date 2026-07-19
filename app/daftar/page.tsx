@@ -76,7 +76,7 @@ export default function DaftarPage() {
             Masukkan Kode Verifikasi
           </h1>
           <p className="mt-3 text-[15px] leading-relaxed text-[var(--color-muted)]">
-            Kami kirim kode 6 digit ke{' '}
+            Kami kirim kode verifikasi ke{' '}
             <span className="font-medium text-[var(--color-ink)]">{submittedEmail}</span>.
           </p>
 

@@ -55,10 +55,13 @@ export async function signUpWithPassword(formData: FormData): Promise<AuthResult
 
 export async function verifySignupOtp(formData: FormData): Promise<AuthResult> {
   const email = formData.get('email')?.toString().trim().toLowerCase() ?? ''
-  const token = formData.get('token')?.toString().trim() ?? ''
+  const token = formData.get('token')?.toString().trim().replace(/\D/g, '') ?? ''
 
-  if (!/^\d{6}$/.test(token)) {
-    return { success: false, error: 'Kode harus 6 digit angka.' }
+  // Panjang kode OTP itu setting di sisi Supabase (bisa 6-10 digit,
+  // defaultnya sempat berubah dari 6 ke 8 tanpa pengumuman besar) — jangan
+  // hardcode angka pasti di sini, cukup validasi bentuknya angka semua.
+  if (!/^\d{6,10}$/.test(token)) {
+    return { success: false, error: 'Kode nggak valid. Cek lagi angka di email kamu.' }
   }
 
   const supabase = await createClient()

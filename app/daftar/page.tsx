@@ -87,12 +87,12 @@ export default function DaftarPage() {
               type="text"
               inputMode="numeric"
               autoComplete="one-time-code"
-              pattern="\d{6}"
-              maxLength={6}
+              pattern="\d{6,10}"
+              maxLength={10}
               required
               autoFocus
-              placeholder="123456"
-              className={`${inputClass} text-center text-lg tracking-[0.5em]`}
+              placeholder="Kode dari email"
+              className={`${inputClass} text-center text-lg tracking-[0.3em]`}
             />
             <button
               type="submit"

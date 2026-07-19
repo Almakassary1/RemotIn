@@ -32,12 +32,12 @@ export async function requestPasswordReset(formData: FormData): Promise<AuthResu
 
 export async function resetPasswordWithOtp(formData: FormData): Promise<AuthResult> {
   const email = formData.get('email')?.toString().trim().toLowerCase() ?? ''
-  const token = formData.get('token')?.toString().trim() ?? ''
+  const token = formData.get('token')?.toString().trim().replace(/\D/g, '') ?? ''
   const password = formData.get('password')?.toString() ?? ''
   const confirmPassword = formData.get('confirm_password')?.toString() ?? ''
 
-  if (!/^\d{6}$/.test(token)) {
-    return { success: false, error: 'Kode harus 6 digit angka.' }
+  if (!/^\d{6,10}$/.test(token)) {
+    return { success: false, error: 'Kode nggak valid. Cek lagi angka di email kamu.' }
   }
   if (password.length < 8) {
     return { success: false, error: 'Password minimal 8 karakter.' }

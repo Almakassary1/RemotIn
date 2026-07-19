@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, LogOut } from 'lucide-react'
+import { signOut } from '@/app/auth/actions'
 
 const NAV_LINKS = [
   { label: 'Cari Loker', href: '/' },
@@ -11,9 +12,28 @@ const NAV_LINKS = [
   { label: 'Tersimpan', href: '/tersimpan' },
 ]
 
-export default function Navbar() {
+interface NavbarProps {
+  // Cukup email-nya saja yang dikirim dari Server Component — hindari
+  // kirim seluruh object user (ada metadata provider dll yang nggak perlu
+  // ikut ke client bundle).
+  userEmail: string | null
+}
+
+export default function Navbar({ userEmail }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
+
+  // Hapus tanda "sudah pernah digabung" sebelum logout — supaya kalau
+  // orang simpan loker lagi selagi belum login (jadi tamu), terus login
+  // balik ke akun yang sama, loker yang disimpan di masa "tamu" itu ikut
+  // digabung lagi. Tanpa ini, penggabungan cuma jalan sekali seumur hidup
+  // per akun, bukan sekali per sesi login.
+  async function handleSignOut() {
+    Object.keys(window.localStorage)
+      .filter((key) => key.startsWith('remotin_merged_'))
+      .forEach((key) => window.localStorage.removeItem(key))
+    await signOut()
+  }
 
   return (
     // Catatan: opacity /80 sengaja pakai hex literal (#F7F5F0), bukan var(--color-bg).
@@ -48,6 +68,38 @@ export default function Navbar() {
           >
             + Pasang Loker
           </Link>
+
+          <div className="h-5 w-px bg-[var(--color-line)]" />
+
+          {userEmail ? (
+            <div className="flex items-center gap-3">
+              <span className="max-w-[140px] truncate text-sm text-[var(--color-muted)]" title={userEmail}>
+                {userEmail}
+              </span>
+              <button
+                onClick={handleSignOut}
+                className="flex items-center gap-1.5 text-sm font-medium text-[var(--color-ink)] transition hover:text-[var(--color-primary)]"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                Keluar
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-4">
+              <Link
+                href="/masuk"
+                className="text-sm font-medium text-[var(--color-ink)] transition hover:text-[var(--color-primary)]"
+              >
+                Masuk
+              </Link>
+              <Link
+                href="/daftar"
+                className="text-sm font-medium text-[var(--color-ink)] transition hover:text-[var(--color-primary)]"
+              >
+                Daftar
+              </Link>
+            </div>
+          )}
         </nav>
 
         {/* Mobile toggle */}
@@ -86,6 +138,38 @@ export default function Navbar() {
             >
               + Pasang Loker
             </Link>
+
+            <div className="mt-2 border-t border-[var(--color-line)] pt-3">
+              {userEmail ? (
+                <div className="flex items-center justify-between px-3">
+                  <span className="truncate text-sm text-[var(--color-muted)]">{userEmail}</span>
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center gap-1.5 text-sm font-medium text-[var(--color-ink)]"
+                  >
+                    <LogOut className="h-3.5 w-3.5" />
+                    Keluar
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-1">
+                  <Link
+                    href="/masuk"
+                    onClick={() => setIsOpen(false)}
+                    className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--color-ink)]"
+                  >
+                    Masuk
+                  </Link>
+                  <Link
+                    href="/daftar"
+                    onClick={() => setIsOpen(false)}
+                    className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--color-ink)]"
+                  >
+                    Daftar
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         </nav>
       )}

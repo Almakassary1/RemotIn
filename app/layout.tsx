@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { Fraunces, Plus_Jakarta_Sans } from 'next/font/google'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import AuthSync from '@/components/AuthSync'
+import { createClient } from '@/utils/supabase/server'
 import { SITE_URL, SITE_NAME } from '@/lib/site-config'
 import './globals.css'
 
@@ -39,13 +41,21 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
   return (
     <html lang="id">
       <body
         className={`${fraunces.variable} ${jakarta.variable} flex min-h-screen flex-col font-[family-name:var(--font-body)]`}
       >
-        <Navbar />
+        {/* Tak-tampak — cuma nunggu event login buat gabung loker
+            localStorage ke akun, lihat components/AuthSync.tsx */}
+        <AuthSync />
+        <Navbar userEmail={user?.email ?? null} />
         {/* flex-1 di sini + flex-col di body = footer selalu menempel di bawah,
             walau konten halaman pendek (mis. halaman kosong/error) */}
         <div className="flex-1">{children}</div>

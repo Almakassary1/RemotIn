@@ -7,7 +7,7 @@ import JobCard from './JobCard'
 import type { Job } from '@/lib/types'
 
 export default function SavedJobsList({ allJobs }: { allJobs: Job[] }) {
-  const { savedIds } = useSavedJobs()
+  const { savedIds, loggedIn } = useSavedJobs()
   const savedJobs = allJobs.filter((job) => savedIds.includes(job.id))
 
   return (
@@ -28,7 +28,17 @@ export default function SavedJobsList({ allJobs }: { allJobs: Job[] }) {
           </h1>
         </div>
         <p className="mt-1.5 text-sm text-[var(--color-muted)]">
-          Tersimpan di browser ini saja — belum sinkron ke perangkat lain (belum perlu akun).
+          {loggedIn ? (
+            'Tersimpan di akun kamu — sinkron di semua device.'
+          ) : (
+            <>
+              Tersimpan di browser ini saja.{' '}
+              <Link href="/masuk" className="font-medium text-[var(--color-primary)] hover:underline">
+                Masuk
+              </Link>{' '}
+              biar sinkron ke semua device.
+            </>
+          )}
         </p>
 
         <div className="mt-8 flex flex-col gap-3">

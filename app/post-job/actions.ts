@@ -1,11 +1,52 @@
 'use server'
 
+import crypto from 'crypto'
 import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 
 interface SubmitJobResult {
   success: boolean
   error?: string
   jobId?: string
+}
+
+// Upload logo pakai admin client (service role) — bukan client biasa,
+// karena upload ini terjadi di form publik tanpa login. Daripada buka
+// storage policy INSERT ke publik (rawan disalahgunakan buat upload
+// sembarang file), kita proses filenya di server SETELAH Turnstile +
+// honeypot lolos, baru upload pakai service role. Pola yang sama dengan
+// alasan createAdminClient() dipakai di app/newsletter/confirm/page.tsx.
+const LOGO_EXTENSION_BY_MIME: Record<string, string> = {
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'image/webp': 'webp',
+  'image/svg+xml': 'svg',
+}
+const MAX_LOGO_BYTES = 2 * 1024 * 1024 // 2MB, samakan dengan file_size_limit bucket
+
+async function uploadCompanyLogo(file: File): Promise<{ url: string | null; error?: string }> {
+  const ext = LOGO_EXTENSION_BY_MIME[file.type]
+  if (!ext) {
+    return { url: null, error: 'Format logo harus PNG, JPG, WEBP, atau SVG.' }
+  }
+  if (file.size > MAX_LOGO_BYTES) {
+    return { url: null, error: 'Ukuran logo maksimal 2MB.' }
+  }
+
+  const admin = createAdminClient()
+  const path = `${crypto.randomUUID()}.${ext}`
+
+  const { error: uploadError } = await admin.storage
+    .from('company-logos')
+    .upload(path, file, { contentType: file.type, upsert: false })
+
+  if (uploadError) {
+    console.error('Gagal upload logo perusahaan:', uploadError.message)
+    return { url: null, error: 'Gagal mengunggah logo. Silakan coba lagi.' }
+  }
+
+  const { data } = admin.storage.from('company-logos').getPublicUrl(path)
+  return { url: data.publicUrl }
 }
 
 interface TurnstileVerifyResponse {
@@ -88,7 +129,6 @@ export async function submitJob(formData: FormData): Promise<SubmitJobResult> {
 
   const title = formData.get('title')?.toString().trim() ?? ''
   const companyName = formData.get('company_name')?.toString().trim() ?? ''
-  const companyLogo = formData.get('company_logo')?.toString().trim() ?? ''
   const categoryId = formData.get('category_id')?.toString() ?? ''
   const jobType = formData.get('job_type')?.toString() ?? ''
   const workArrangement = formData.get('work_arrangement')?.toString() || 'Full Remote'
@@ -113,14 +153,23 @@ export async function submitJob(formData: FormData): Promise<SubmitJobResult> {
   if (workArrangement !== 'Full Remote' && workArrangement !== 'Hybrid') {
     return { success: false, error: 'Susunan kerja tidak valid.' }
   }
-  if (companyLogo && !isValidUrl(companyLogo)) {
-    return { success: false, error: 'URL Logo Perusahaan tidak valid.' }
-  }
   if (title.length > 150 || companyName.length > 150) {
     return { success: false, error: 'Judul posisi atau nama perusahaan terlalu panjang.' }
   }
   if (description.length > 5000) {
     return { success: false, error: 'Deskripsi pekerjaan terlalu panjang (maksimal 5000 karakter).' }
+  }
+
+  // Logo opsional — kalau field file-nya kosong, browser tetap kirim File
+  // kosong (size 0), jadi dicek size dulu sebelum diproses jadi upload.
+  let companyLogoUrl: string | null = null
+  const logoFile = formData.get('company_logo')
+  if (logoFile instanceof File && logoFile.size > 0) {
+    const uploadResult = await uploadCompanyLogo(logoFile)
+    if (uploadResult.error) {
+      return { success: false, error: uploadResult.error }
+    }
+    companyLogoUrl = uploadResult.url
   }
 
   const supabase = await createClient()
@@ -130,7 +179,7 @@ export async function submitJob(formData: FormData): Promise<SubmitJobResult> {
     .insert({
       title,
       company_name: companyName,
-      company_logo: companyLogo || null,
+      company_logo: companyLogoUrl,
       category_id: categoryId || null,
       job_type: jobType,
       work_arrangement: workArrangement,

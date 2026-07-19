@@ -19,7 +19,6 @@ const WORK_ARRANGEMENTS: WorkArrangement[] = ['Full Remote', 'Hybrid']
 const initialForm = {
   title: '',
   company_name: '',
-  company_logo: '',
   category_id: '',
   job_type: 'Full-time' as JobType,
   work_arrangement: 'Full Remote' as WorkArrangement,
@@ -46,6 +45,23 @@ export default function PostJobForm({ categories }: PostJobFormProps) {
   const [newJobId, setNewJobId] = useState<string | null>(null)
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [logoPreview, setLogoPreview] = useState<string | null>(null)
+  const [logoInputKey, setLogoInputKey] = useState(0)
+
+  function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) {
+      setLogoPreview(null)
+      return
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setToast({ type: 'error', message: 'Ukuran logo maksimal 2MB.' })
+      e.target.value = ''
+      setLogoPreview(null)
+      return
+    }
+    setLogoPreview(URL.createObjectURL(file))
+  }
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
@@ -83,6 +99,8 @@ export default function PostJobForm({ categories }: PostJobFormProps) {
     setTurnstileToken(null)
     setSubmitted(false)
     setNewJobId(null)
+    setLogoPreview(null)
+    setLogoInputKey((k) => k + 1) // ganti key supaya input file (uncontrolled) ikut ke-reset
   }
 
   // ===== Halaman sukses (menggantikan form, tanpa auto-redirect) =====
@@ -193,17 +211,30 @@ export default function PostJobForm({ categories }: PostJobFormProps) {
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
               <label className={labelClass} htmlFor="company_logo">
-                URL Logo Perusahaan
+                Logo Perusahaan
               </label>
-              <input
-                id="company_logo"
-                name="company_logo"
-                type="url"
-                value={form.company_logo}
-                onChange={(e) => update('company_logo', e.target.value)}
-                placeholder="https://... (opsional)"
-                className={inputClass}
-              />
+              <div className="flex items-center gap-3">
+                {logoPreview && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={logoPreview}
+                    alt="Preview logo"
+                    className="h-11 w-11 shrink-0 rounded-lg border border-[var(--color-line)] object-contain bg-white"
+                  />
+                )}
+                <input
+                  key={logoInputKey}
+                  id="company_logo"
+                  name="company_logo"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                  onChange={handleLogoChange}
+                  className={`${inputClass} file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--color-bg)] file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-[var(--color-ink)]`}
+                />
+              </div>
+              <p className="mt-1.5 text-xs text-[var(--color-muted)]">
+                Opsional — PNG/JPG/WEBP/SVG, maksimal 2MB.
+              </p>
             </div>
             <div>
               <label className={labelClass} htmlFor="location">

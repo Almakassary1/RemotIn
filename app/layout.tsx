@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { Fraunces, Plus_Jakarta_Sans } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/react'
+import { GoogleAnalytics } from '@next/third-parties/google'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import AuthSync from '@/components/AuthSync'
@@ -60,6 +62,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             walau konten halaman pendek (mis. halaman kosong/error) */}
         <div className="flex-1">{children}</div>
         <Footer />
+
+        {/* Vercel Analytics — otomatis aktif begitu di-deploy, nggak butuh
+            env var apa pun, tinggal diaktifkan sekali di dashboard Vercel
+            (Project → Analytics → Enable). */}
+        <Analytics />
+
+        {/* Google Analytics — cuma render kalau env var-nya di-set, biar
+            nggak ada script GA yang nyoba jalan pakai ID kosong waktu
+            development lokal atau sebelum GA_ID di-set di Vercel. */}
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        )}
       </body>
     </html>
   )

@@ -108,12 +108,13 @@ export default function JobBoard({
         <div className="mx-auto max-w-6xl px-6 py-16 sm:py-20 sm:pb-24">
           <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1fr_300px]">
             <div className="text-center lg:text-left">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-white/80">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-white/90">
                 <span className="relative flex h-1.5 w-1.5">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-accent)] opacity-60" />
                   <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" />
                 </span>
-                {initialJobs.length} loker remote aktif hari ini
+                <span className="text-sm font-bold text-white">{initialJobs.length}</span> loker remote
+                aktif hari ini
               </span>
 
               <h1 className="mt-5 font-[family-name:var(--font-display)] text-4xl font-medium leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-[3.25rem]">
@@ -137,10 +138,10 @@ export default function JobBoard({
 
             {initialJobs[0] && (
               <div className="hidden lg:block">
-                <div className="relative mx-auto w-56 -rotate-3">
+                <div className="relative mx-auto w-56 -rotate-6">
                   <div
                     aria-hidden="true"
-                    className="absolute inset-0 translate-x-2 translate-y-2 rounded-2xl bg-black/15"
+                    className="absolute inset-0 translate-x-2.5 translate-y-2.5 rounded-2xl bg-black/25"
                   />
                   <Link
                     href={`/jobs/${initialJobs[0].id}`}
@@ -213,7 +214,7 @@ export default function JobBoard({
               <div className="mt-6 flex justify-center">
                 <button
                   onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
-                  className="rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-6 py-2.5 text-sm font-medium text-[var(--color-ink)] transition hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
+                  className="rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-6 py-2.5 text-sm font-medium text-[var(--color-ink)] shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:shadow-md active:translate-y-0 active:scale-[0.98]"
                 >
                   Muat Lebih Banyak ({sortedJobs.length - visibleCount} lagi)
                 </button>

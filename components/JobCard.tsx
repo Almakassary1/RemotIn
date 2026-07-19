@@ -15,7 +15,7 @@ export default function JobCard({ job }: { job: Job }) {
   const saved = isSaved(job.id)
 
   return (
-    <div className="group relative rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] transition hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-8px_rgba(14,110,91,0.25)]">
+    <div className="group relative rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] shadow-sm transition hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-8px_rgba(14,110,91,0.25)]">
       {(job.is_featured || hot) && (
         <div className="absolute -top-2.5 left-5 z-10 flex gap-1.5">
           {job.is_featured && (

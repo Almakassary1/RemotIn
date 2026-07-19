@@ -29,8 +29,8 @@ export default function Footer() {
 
   return (
     <footer className="bg-[var(--color-primary)]">
-      <div className="mx-auto max-w-6xl px-6 py-14">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-3">
+      <div className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
+        <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 md:grid-cols-3">
           {/* Brand */}
           <div className="sm:col-span-2 md:col-span-1">
             <div className="flex items-center gap-2">
@@ -110,7 +110,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar: Hak Cipta + link legal */}
-        <div className="mt-12 flex flex-col-reverse items-center justify-between gap-4 border-t border-[#F7F5F0]/10 pt-6 sm:flex-row">
+        <div className="mt-16 flex flex-col-reverse items-center justify-between gap-4 border-t border-[#F7F5F0]/10 pt-8 sm:flex-row">
           <p className="text-xs text-[#F7F5F0]/40">
             © {year} RemotIn. Seluruh hak cipta dilindungi.
           </p>

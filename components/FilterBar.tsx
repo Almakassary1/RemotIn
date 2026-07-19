@@ -43,7 +43,7 @@ export default function FilterBar({
   resultCount,
 }: FilterBarProps) {
   return (
-    <div className="flex flex-col gap-4 border-b border-[var(--color-line)] pb-5 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-4 rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
       {/* Filter Kategori */}
       <div className="flex flex-wrap items-center gap-2">
         <button onClick={() => onCategoryChange(null)} className={pillClass(activeCategory === null)}>
@@ -66,7 +66,7 @@ export default function FilterBar({
         <select
           value={activeJobType ?? ''}
           onChange={(e) => onJobTypeChange((e.target.value || null) as JobType | null)}
-          className="rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-3.5 py-1.5 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--color-primary)]"
+          className="rounded-full border border-[var(--color-line)] bg-[var(--color-bg)] px-3.5 py-1.5 text-sm text-[var(--color-ink)] outline-none transition focus:border-[var(--color-primary)]"
         >
           <option value="">Semua Tipe</option>
           {JOB_TYPES.map((type) => (
@@ -80,7 +80,7 @@ export default function FilterBar({
           onChange={(e) =>
             onWorkArrangementChange((e.target.value || null) as WorkArrangement | null)
           }
-          className="rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-3.5 py-1.5 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--color-primary)]"
+          className="rounded-full border border-[var(--color-line)] bg-[var(--color-bg)] px-3.5 py-1.5 text-sm text-[var(--color-ink)] outline-none transition focus:border-[var(--color-primary)]"
         >
           <option value="">Remote & Hybrid</option>
           {WORK_ARRANGEMENTS.map((arrangement) => (
@@ -92,7 +92,7 @@ export default function FilterBar({
         <select
           value={minSalary}
           onChange={(e) => onMinSalaryChange(Number(e.target.value))}
-          className="rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-3.5 py-1.5 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--color-primary)]"
+          className="rounded-full border border-[var(--color-line)] bg-[var(--color-bg)] px-3.5 py-1.5 text-sm text-[var(--color-ink)] outline-none transition focus:border-[var(--color-primary)]"
         >
           {MIN_SALARY_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -103,7 +103,7 @@ export default function FilterBar({
         <select
           value={sortBy}
           onChange={(e) => onSortChange(e.target.value as SortOption)}
-          className="rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-3.5 py-1.5 text-sm text-[var(--color-ink)] outline-none focus:border-[var(--color-primary)]"
+          className="rounded-full border border-[var(--color-line)] bg-[var(--color-bg)] px-3.5 py-1.5 text-sm text-[var(--color-ink)] outline-none transition focus:border-[var(--color-primary)]"
         >
           <option value="newest">Terbaru</option>
           <option value="salary">Gaji Tertinggi</option>

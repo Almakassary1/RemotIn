@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 
-// Satu route ini dipakai buat 3 alur sekaligus: konfirmasi email daftar,
-// selesai login Google, dan link reset password — ketiganya sama-sama
-// balik ke sini bawa `code` yang ditukar jadi sesi aktif. Bedanya cuma
-// tujuan redirect setelahnya, dikontrol lewat query param `next`.
+// Route ini sekarang CUMA dipakai buat selesai login Google (redirect
+// dari Google balik ke sini bawa `code` yang ditukar jadi sesi aktif).
+// Konfirmasi daftar & reset password TIDAK lewat sini lagi — dua alur itu
+// sekarang pakai kode 6 digit (verifyOtp), bukan link yang diklik, biar
+// nggak kena masalah "email prefetching" (lihat app/daftar/actions.ts).
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')

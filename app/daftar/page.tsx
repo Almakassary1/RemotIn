@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Loader2, MailCheck } from 'lucide-react'
-import { signUpWithPassword } from './actions'
+import { signUpWithPassword, verifySignupOtp, resendSignupOtp } from './actions'
 import { signInWithGoogle } from '@/app/masuk/actions'
 import Toast from '@/components/Toast'
 
@@ -13,6 +13,7 @@ const labelClass = 'mb-1.5 block text-sm font-medium text-[var(--color-ink)]'
 
 export default function DaftarPage() {
   const [loading, setLoading] = useState(false)
+  const [resending, setResending] = useState(false)
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null)
 
@@ -34,27 +35,91 @@ export default function DaftarPage() {
     setSubmittedEmail(email)
   }
 
+  async function handleVerify(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setLoading(true)
+    setToast(null)
+
+    const formData = new FormData(e.currentTarget)
+    const result = await verifySignupOtp(formData)
+
+    if (!result.success) {
+      setToast({ type: 'error', message: result.error ?? 'Kode salah.' })
+      setLoading(false)
+      return
+    }
+
+    // Full navigation sengaja dipakai supaya layout server (Navbar) dan
+    // AuthSync ikut mount ulang dengan sesi terbaru.
+    window.location.href = '/'
+  }
+
+  async function handleResend() {
+    if (!submittedEmail) return
+    setResending(true)
+    const result = await resendSignupOtp(submittedEmail)
+    setResending(false)
+    setToast({
+      type: result.success ? 'success' : 'error',
+      message: result.success ? 'Kode baru sudah dikirim.' : (result.error ?? 'Gagal kirim ulang.'),
+    })
+  }
+
   if (submittedEmail) {
     return (
       <main className="min-h-screen bg-[var(--color-bg)]">
-        <div className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-6 text-center">
+        <div className="mx-auto flex min-h-screen max-w-sm flex-col items-center justify-center px-6 text-center">
           <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50">
             <MailCheck className="h-7 w-7 text-[var(--color-primary)]" />
           </span>
           <h1 className="mt-5 font-[family-name:var(--font-display)] text-2xl font-semibold text-[var(--color-ink)]">
-            Cek Email Kamu
+            Masukkan Kode Verifikasi
           </h1>
           <p className="mt-3 text-[15px] leading-relaxed text-[var(--color-muted)]">
-            Kami kirim link konfirmasi ke <span className="font-medium text-[var(--color-ink)]">{submittedEmail}</span>.
-            Klik link itu buat aktifkan akun, baru bisa masuk.
+            Kami kirim kode 6 digit ke{' '}
+            <span className="font-medium text-[var(--color-ink)]">{submittedEmail}</span>.
           </p>
-          <Link
-            href="/"
-            className="mt-8 rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#0A5347]"
+
+          <form onSubmit={handleVerify} className="mt-6 w-full">
+            <input type="hidden" name="email" value={submittedEmail} />
+            <input
+              name="token"
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              pattern="\d{6}"
+              maxLength={6}
+              required
+              autoFocus
+              placeholder="123456"
+              className={`${inputClass} text-center text-lg tracking-[0.5em]`}
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#0A5347] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Memverifikasi...
+                </>
+              ) : (
+                'Verifikasi'
+              )}
+            </button>
+          </form>
+
+          <button
+            onClick={handleResend}
+            disabled={resending}
+            className="mt-4 text-sm font-medium text-[var(--color-primary)] hover:underline disabled:opacity-60"
           >
-            Kembali ke Beranda
-          </Link>
+            {resending ? 'Mengirim...' : 'Kirim ulang kode'}
+          </button>
         </div>
+
+        {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
       </main>
     )
   }

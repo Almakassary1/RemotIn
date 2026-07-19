@@ -12,7 +12,7 @@ const inputClass =
 const labelClass = 'mb-1.5 block text-sm font-medium text-[var(--color-ink)]'
 
 const CALLBACK_ERROR_MESSAGES: Record<string, string> = {
-  auth: 'Link ini sudah tidak valid atau kedaluwarsa. Coba kirim ulang dari awal.',
+  auth: 'Gagal masuk dengan Google. Silakan coba lagi.',
   google: 'Gagal memulai login Google. Silakan coba lagi.',
 }
 

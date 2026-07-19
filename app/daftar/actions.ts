@@ -1,7 +1,6 @@
 'use server'
 
 import { createClient } from '@/utils/supabase/server'
-import { SITE_URL } from '@/lib/site-config'
 
 interface AuthResult {
   success: boolean
@@ -29,15 +28,15 @@ export async function signUpWithPassword(formData: FormData): Promise<AuthResult
 
   const supabase = await createClient()
 
-  // emailRedirectTo wajib ada — tanpa ini Supabase pakai Site URL default
-  // dari dashboard yang mungkin belum di-set ke domain custom. Verifikasi
-  // WAJIB (di-set di dashboard Supabase, bukan di kode) — konsisten sama
-  // pola double opt-in newsletter.
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: { emailRedirectTo: `${SITE_URL}/auth/callback` },
-  })
+  // Sengaja TANPA emailRedirectTo — kita pakai alur kode 6 digit
+  // (verifyOtp), bukan link yang diklik. Ini menghindari masalah "email
+  // prefetching": sistem scan keamanan email (terutama Gmail) suka
+  // otomatis "buka" link di email buat cek keamanan, yang bikin link
+  // ke-pakai duluan sebelum orangnya sendiri sempat klik — hasilnya link
+  // dianggap kedaluwarsa padahal baru dikirim beberapa detik. Kode manual
+  // nggak kena masalah itu karena cuma valid kalau diketik sengaja oleh
+  // orangnya. Lihat Bagian 10 dokumentasi buat detail kejadian aslinya.
+  const { error } = await supabase.auth.signUp({ email, password })
 
   if (error) {
     const msg = error.message.toLowerCase()
@@ -49,6 +48,37 @@ export async function signUpWithPassword(formData: FormData): Promise<AuthResult
     }
     console.error('Gagal mendaftar:', error.message)
     return { success: false, error: 'Gagal mendaftar. Silakan coba lagi.' }
+  }
+
+  return { success: true }
+}
+
+export async function verifySignupOtp(formData: FormData): Promise<AuthResult> {
+  const email = formData.get('email')?.toString().trim().toLowerCase() ?? ''
+  const token = formData.get('token')?.toString().trim() ?? ''
+
+  if (!/^\d{6}$/.test(token)) {
+    return { success: false, error: 'Kode harus 6 digit angka.' }
+  }
+
+  const supabase = await createClient()
+  const { error } = await supabase.auth.verifyOtp({ email, token, type: 'signup' })
+
+  if (error) {
+    console.error('Gagal verifikasi kode daftar:', error.message)
+    return { success: false, error: 'Kode salah atau sudah kedaluwarsa. Coba kirim ulang.' }
+  }
+
+  return { success: true }
+}
+
+export async function resendSignupOtp(email: string): Promise<AuthResult> {
+  const supabase = await createClient()
+  const { error } = await supabase.auth.resend({ type: 'signup', email })
+
+  if (error) {
+    console.error('Gagal kirim ulang kode daftar:', error.message)
+    return { success: false, error: 'Gagal kirim ulang. Coba lagi sebentar lagi.' }
   }
 
   return { success: true }

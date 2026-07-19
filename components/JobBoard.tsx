@@ -124,7 +124,7 @@ export default function JobBoard({
                 {heroSubtitle}
               </p>
 
-              <div className="mx-auto mt-8 flex max-w-lg items-center gap-2 rounded-full bg-white p-1.5 pl-4 shadow-lg lg:mx-0">
+              <div className="mx-auto mt-8 flex max-w-lg items-center gap-2 rounded-full bg-white p-1.5 pl-4 shadow-[0_8px_24px_-4px_rgba(0,0,0,0.35)] lg:mx-0">
                 <Search className="h-4 w-4 flex-shrink-0 text-[var(--color-muted)]" />
                 <input
                   type="text"
@@ -138,7 +138,7 @@ export default function JobBoard({
 
             {initialJobs[0] && (
               <div className="hidden lg:block">
-                <div className="relative mx-auto w-56 -rotate-6">
+                <div className="relative mx-auto w-64 -rotate-6">
                   <div
                     aria-hidden="true"
                     className="absolute inset-0 translate-x-2.5 translate-y-2.5 rounded-2xl bg-black/25"

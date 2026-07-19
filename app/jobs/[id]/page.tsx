@@ -165,7 +165,7 @@ export default async function JobDetailPage({ params }: PageProps) {
             href={job.apply_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#0A5347] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2"
+            className="inline-flex flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-medium tracking-wide text-white shadow-[0_4px_14px_-2px_rgba(14,110,91,0.4)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#0A5347] hover:shadow-[0_6px_18px_-2px_rgba(14,110,91,0.5)] active:translate-y-0 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2"
           >
             Lamar Sekarang
           </a>
@@ -300,7 +300,7 @@ export default async function JobDetailPage({ params }: PageProps) {
               href={job.apply_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-full border border-[var(--color-primary)] px-6 py-3 text-center text-sm font-medium text-[var(--color-primary)] transition hover:bg-[var(--color-primary)] hover:text-white"
+              className="rounded-full border border-[var(--color-primary)] px-6 py-3 text-center text-sm font-medium tracking-wide text-[var(--color-primary)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[var(--color-primary)] hover:text-white hover:shadow-[0_4px_14px_-2px_rgba(14,110,91,0.35)] active:translate-y-0 active:scale-[0.98]"
             >
               Lamar Sekarang
             </a>

@@ -104,8 +104,8 @@ export default function JobBoard({
           (desktop) pakai loker asli teratas (biasanya Featured, karena
           initialJobs sudah di-sort is_featured dulu di app/page.tsx) — bukan
           ilustrasi dekoratif, biar kelihatan produknya beneran, bukan hiasan. */}
-      <section className="bg-[var(--color-primary)]">
-        <div className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
+      <section className="rounded-b-[2.5rem] bg-[var(--color-primary)]">
+        <div className="mx-auto max-w-6xl px-6 py-16 sm:py-20 sm:pb-24">
           <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1fr_300px]">
             <div className="text-center lg:text-left">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-medium text-white/80">

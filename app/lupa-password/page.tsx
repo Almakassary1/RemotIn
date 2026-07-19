@@ -64,7 +64,7 @@ export default function LupaPasswordPage() {
           </h1>
           <Link
             href="/masuk"
-            className="mt-8 rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#0A5347]"
+            className="mt-8 rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-medium tracking-wide text-white shadow-[0_4px_14px_-2px_rgba(14,110,91,0.4)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#0A5347] hover:shadow-[0_6px_18px_-2px_rgba(14,110,91,0.5)] active:translate-y-0 active:scale-[0.98]"
           >
             Ke Halaman Masuk
           </Link>
@@ -137,7 +137,7 @@ export default function LupaPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#0A5347] disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-medium tracking-wide text-white shadow-[0_4px_14px_-2px_rgba(14,110,91,0.4)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#0A5347] hover:shadow-[0_6px_18px_-2px_rgba(14,110,91,0.5)] active:translate-y-0 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (
                 <>
@@ -200,7 +200,7 @@ export default function LupaPasswordPage() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#0A5347] disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-medium tracking-wide text-white shadow-[0_4px_14px_-2px_rgba(14,110,91,0.4)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#0A5347] hover:shadow-[0_6px_18px_-2px_rgba(14,110,91,0.5)] active:translate-y-0 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? (
               <>

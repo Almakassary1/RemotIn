@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+﻿import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -6,7 +6,7 @@ import { ArrowLeft, Briefcase, Wallet, CalendarDays, Layers, Building2, BadgeChe
 import { FaWhatsapp } from 'react-icons/fa'
 import SaveJobButton from '@/components/SaveJobButton'
 import { createClient } from '@/utils/supabase/server'
-import { getExpiryCutoffISOString, buildJobPostingSchema, isJobHot } from '@/lib/job-utils'
+import { getExpiryCutoffISOString, buildJobPostingSchema, isJobHot, safeJsonLd } from '@/lib/job-utils'
 import { SITE_URL } from '@/lib/site-config'
 import type { Job } from '@/lib/types'
 
@@ -90,7 +90,7 @@ export default async function JobDetailPage({ params }: PageProps) {
           cuma dibaca oleh crawler mesin pencari. */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJobPostingSchema(job)) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd(buildJobPostingSchema(job)) }}
       />
       <div className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
         <Link

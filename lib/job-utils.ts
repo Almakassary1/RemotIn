@@ -107,3 +107,24 @@ export function buildJobPostingSchema(job: Job) {
 
   return schema
 }
+
+// =====================================================================
+// Serialisasi AMAN untuk JSON-LD yang di-inject lewat dangerouslySetInnerHTML.
+//
+// JSON.stringify() BIASA tidak meng-escape "<", ">", atau "&" — jadi kalau
+// title/description loker (input publik dari form post-job) kebetulan
+// mengandung teks seperti "</script><script>...", string itu akan MEMOTONG
+// tag <script type="application/ld+json"> lebih awal dan browser akan
+// menjalankan apa pun yang ada setelahnya sebagai HTML/JS baru. Ini stored
+// XSS yang nempel di halaman detail loker, bisa kena semua pengunjung.
+//
+// Fix: escape 3 karakter itu jadi bentuk unicode escape (\u003c dkk) —
+// tetap valid sebagai JSON (parser JSON paham \uXXXX), tapi nggak akan
+// pernah membentuk delimiter HTML apa pun lagi.
+// =====================================================================
+export function safeJsonLd(data: unknown): string {
+  return JSON.stringify(data)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+}

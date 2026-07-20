@@ -35,11 +35,13 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: 'RemotIn — Loker Remote & WFH Indonesia',
     description: DEFAULT_DESCRIPTION,
+    images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630, alt: SITE_NAME }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'RemotIn — Loker Remote & WFH Indonesia',
     description: DEFAULT_DESCRIPTION,
+    images: [`${SITE_URL}/og-image.png`],
   },
 }
 

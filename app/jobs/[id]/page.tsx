@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, Briefcase, Wallet, CalendarDays, Layers, Building2, BadgeCheck } from 'lucide-react'
@@ -103,9 +104,11 @@ export default async function JobDetailPage({ params }: PageProps) {
         {/* ===== Header Loker ===== */}
         <div className="mt-6 flex flex-col gap-6 rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 sm:flex-row sm:items-start sm:justify-between sm:p-8">
           <div className="flex items-start gap-4">
-            <img
+            <Image
               src={job.company_logo ?? fallbackLogo}
               alt={job.company_name}
+              width={64}
+              height={64}
               className="h-16 w-16 flex-shrink-0 rounded-2xl object-cover"
             />
             <div>
@@ -287,9 +290,11 @@ export default async function JobDetailPage({ params }: PageProps) {
                 href={`/perusahaan/${encodeURIComponent(job.company_name)}`}
                 className="mt-3 flex items-center gap-3 rounded-xl transition hover:opacity-80"
               >
-                <img
+                <Image
                   src={job.company_logo ?? fallbackLogo}
                   alt={job.company_name}
+                  width={40}
+                  height={40}
                   className="h-10 w-10 rounded-lg object-cover"
                 />
                 <p className="text-sm font-medium text-[var(--color-ink)]">{job.company_name}</p>

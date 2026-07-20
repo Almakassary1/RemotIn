@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Search } from 'lucide-react'
 import type { Job, Category, JobType, WorkArrangement } from '@/lib/types'
@@ -149,10 +150,11 @@ export default function JobBoard({
                   >
                     <div className="flex items-center gap-2.5">
                       {initialJobs[0].company_logo ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <Image
                           src={initialJobs[0].company_logo}
                           alt=""
+                          width={36}
+                          height={36}
                           className="h-9 w-9 shrink-0 rounded-lg object-contain"
                         />
                       ) : (

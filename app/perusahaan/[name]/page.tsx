@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, BadgeCheck } from 'lucide-react'
@@ -102,9 +103,11 @@ export default async function CompanyProfilePage({ params }: PageProps) {
 
         {/* ===== Header Profil Perusahaan ===== */}
         <div className="mt-6 flex items-center gap-4 rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 sm:p-8">
-          <img
+          <Image
             src={company.company_logo ?? fallbackLogo}
             alt={companyName}
+            width={64}
+            height={64}
             className="h-16 w-16 flex-shrink-0 rounded-2xl object-cover"
           />
           <div>

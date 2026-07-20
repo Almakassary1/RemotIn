@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { Briefcase, Wallet, ArrowRight, Clock, Building2, Bookmark, BadgeCheck } from 'lucide-react'
 import { formatRelativeDate, isJobHot } from '@/lib/job-utils'
@@ -47,10 +48,14 @@ export default function JobCard({ job }: { job: Job }) {
         href={`/jobs/${job.id}`}
         className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:gap-6"
       >
-        {/* Logo perusahaan */}
-        <img
+        {/* Logo perusahaan — next/image otomatis nge-resize & kompres,
+            penting karena logo upload asli bisa sampai 2MB tapi cuma
+            ditampilin 48x48px di sini */}
+        <Image
           src={job.company_logo ?? fallbackLogo}
           alt={job.company_name}
+          width={48}
+          height={48}
           className="h-12 w-12 flex-shrink-0 rounded-xl object-cover"
         />
 

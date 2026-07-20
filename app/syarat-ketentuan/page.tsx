@@ -98,8 +98,8 @@ export default function TermsPage() {
         <h2 className={sectionTitle}>9. Kontak</h2>
         <p className={paragraph}>
           Pertanyaan seputar syarat & ketentuan ini bisa dikirim ke{' '}
-          <a href="mailto:hello@remotinjobs.com" className={linkClass}>
-            hello@remotinjobs.com
+          <a href="mailto:remotinjobs@gmail.com" className={linkClass}>
+            remotinjobs@gmail.com
           </a>
           .
         </p>

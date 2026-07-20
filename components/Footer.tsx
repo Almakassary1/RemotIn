@@ -62,7 +62,7 @@ export default function Footer() {
                 <FaLinkedin className="h-4 w-4" />
               </a>
               <a
-                href="mailto:hello@remotinjobs.com"
+                href="mailto:remotinjobs@gmail.com"
                 aria-label="Email"
                 className="text-[#F7F5F0]/50 transition hover:text-[var(--color-accent)]"
               >

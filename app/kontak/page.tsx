@@ -20,11 +20,11 @@ export default function ContactPage() {
         </p>
 
         <a
-          href="mailto:hello@remotinjobs.com"
+          href="mailto:remotinjobs@gmail.com"
           className="mt-8 inline-flex items-center gap-2 rounded-full bg-[var(--color-primary)] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#0A5347]"
         >
           <Mail className="h-4 w-4" />
-          hello@remotinjobs.com
+          remotinjobs@gmail.com
         </a>
 
         <div className="mt-10 rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 text-left">

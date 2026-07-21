@@ -16,18 +16,24 @@ interface SubmitJobResult {
 // sembarang file), kita proses filenya di server SETELAH Turnstile +
 // honeypot lolos, baru upload pakai service role. Pola yang sama dengan
 // alasan createAdminClient() dipakai di app/newsletter/confirm/page.tsx.
+// SVG SENGAJA tidak diizinkan di sini. Beda dari format gambar lain,
+// file SVG bisa berisi <script> atau event handler (onload, dst) yang
+// tereksekusi kalau file dibuka langsung di tab baru — celah stored XSS
+// lewat upload logo. PNG/JPG/WEBP sudah cukup untuk kebutuhan logo
+// perusahaan, jadi opsi paling aman adalah tidak menerima SVG sama
+// sekali, bukan mencoba men-sanitize-nya (sanitasi SVG gampang bocor
+// kalau cuma pakai pendekatan blacklist/regex).
 const LOGO_EXTENSION_BY_MIME: Record<string, string> = {
   'image/png': 'png',
   'image/jpeg': 'jpg',
   'image/webp': 'webp',
-  'image/svg+xml': 'svg',
 }
 const MAX_LOGO_BYTES = 2 * 1024 * 1024 // 2MB, samakan dengan file_size_limit bucket
 
 async function uploadCompanyLogo(file: File): Promise<{ url: string | null; error?: string }> {
   const ext = LOGO_EXTENSION_BY_MIME[file.type]
   if (!ext) {
-    return { url: null, error: 'Format logo harus PNG, JPG, WEBP, atau SVG.' }
+    return { url: null, error: 'Format logo harus PNG, JPG, atau WEBP.' }
   }
   if (file.size > MAX_LOGO_BYTES) {
     return { url: null, error: 'Ukuran logo maksimal 2MB.' }

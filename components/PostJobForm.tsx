@@ -227,13 +227,13 @@ export default function PostJobForm({ categories }: PostJobFormProps) {
                   id="company_logo"
                   name="company_logo"
                   type="file"
-                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                  accept="image/png,image/jpeg,image/webp"
                   onChange={handleLogoChange}
                   className={`${inputClass} file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--color-bg)] file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-[var(--color-ink)]`}
                 />
               </div>
               <p className="mt-1.5 text-xs text-[var(--color-muted)]">
-                Opsional — PNG/JPG/WEBP/SVG, maksimal 2MB.
+                Opsional — PNG/JPG/WEBP, maksimal 2MB.
               </p>
             </div>
             <div>

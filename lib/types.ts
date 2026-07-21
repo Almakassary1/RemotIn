@@ -19,6 +19,10 @@ export interface Job {
   job_type: JobType
   work_arrangement: WorkArrangement
   category_id: string | null
+  // Ditambahkan lewat migrasi add_companies_table — lihat lib/company-service.ts.
+  // Belum dipakai di query manapun sampai Fase 2 (halaman profil perusahaan
+  // dipindah ke tabel companies), tapi sudah diisi tiap loker baru dibuat.
+  company_id: string | null
   salary_range: string | null
   description: string
   apply_url: string

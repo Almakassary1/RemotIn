@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/lib/admin-auth'
 import { createAdminClient } from '@/utils/supabase/admin'
+import { upsertCompany } from '@/lib/company-service'
 
 interface AddJobResult {
   success: boolean
@@ -96,12 +97,20 @@ export async function addJob(formData: FormData): Promise<AddJobResult> {
 
   const supabase = createAdminClient()
 
+  // Sambungkan ke tabel companies (dibuat kalau belum ada, disambungkan
+  // kalau nama yang sama sudah pernah posting loker lain sebelumnya).
+  const companyId = await upsertCompany(supabase, {
+    name: companyName,
+    logoUrl: companyLogo || null,
+  })
+
   const { data, error } = await supabase
     .from('jobs')
     .insert({
       title,
       company_name: companyName,
       company_logo: companyLogo || null,
+      company_id: companyId,
       category_id: categoryId || null,
       job_type: jobType,
       work_arrangement: workArrangement,

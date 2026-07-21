@@ -3,6 +3,7 @@
 import crypto from 'crypto'
 import { createClient } from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
+import { upsertCompany } from '@/lib/company-service'
 
 interface SubmitJobResult {
   success: boolean
@@ -178,6 +179,14 @@ export async function submitJob(formData: FormData): Promise<SubmitJobResult> {
     companyLogoUrl = uploadResult.url
   }
 
+  // Sambungkan ke tabel companies (dibuat kalau belum ada, disambungkan
+  // kalau nama yang sama sudah pernah posting loker lain sebelumnya).
+  // Pakai service role — lihat komentar di lib/company-service.ts.
+  const companyId = await upsertCompany(createAdminClient(), {
+    name: companyName,
+    logoUrl: companyLogoUrl,
+  })
+
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -186,6 +195,7 @@ export async function submitJob(formData: FormData): Promise<SubmitJobResult> {
       title,
       company_name: companyName,
       company_logo: companyLogoUrl,
+      company_id: companyId,
       category_id: categoryId || null,
       job_type: jobType,
       work_arrangement: workArrangement,

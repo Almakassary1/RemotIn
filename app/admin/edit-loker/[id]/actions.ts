@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { requireAdmin } from '@/lib/admin-auth'
 import { createAdminClient } from '@/utils/supabase/admin'
+import { upsertCompany } from '@/lib/company-service'
 
 interface UpdateJobResult {
   success: boolean
@@ -87,12 +88,21 @@ export async function updateJob(jobId: string, formData: FormData): Promise<Upda
 
   const supabase = createAdminClient()
 
+  // Sambungkan ulang ke tabel companies — penting terutama kalau admin
+  // mengubah nama perusahaan pas edit, supaya company_id ikut nyambung
+  // ke perusahaan yang benar (bukan tetap nempel ke company_id lama).
+  const companyId = await upsertCompany(supabase, {
+    name: companyName,
+    logoUrl: companyLogo || null,
+  })
+
   const { error } = await supabase
     .from('jobs')
     .update({
       title,
       company_name: companyName,
       company_logo: companyLogo || null,
+      company_id: companyId,
       category_id: categoryId || null,
       job_type: jobType,
       work_arrangement: workArrangement,

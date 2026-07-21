@@ -6,6 +6,17 @@ export interface Category {
   created_at: string
 }
 
+// Ditambahkan lewat migrasi add_companies_table (Fix #8 Fase 1) — lihat
+// lib/company-service.ts.
+export interface Company {
+  id: string
+  name: string
+  slug: string
+  logo_url: string | null
+  verified: boolean
+  created_at: string
+}
+
 export type JobType = 'Full-time' | 'Part-time' | 'Contract' | 'Freelance'
 
 export type WorkArrangement = 'Full Remote' | 'Hybrid'
@@ -40,4 +51,8 @@ export interface Job {
   tags: string[]
   // Data hasil join dari tabel categories (lihat query `*, categories(*)` di app/page.tsx)
   categories?: Category | null
+  // Data hasil join dari tabel companies -- cuma terisi kalau query-nya
+  // eksplisit minta `companies(*)` (lihat app/jobs/[id]/page.tsx). Dipakai
+  // buat bikin link ke halaman profil perusahaan pakai slug (Fix #8 Fase 2).
+  companies?: Company | null
 }

@@ -2,12 +2,21 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@/utils/supabase/server'
-import { getExpiryCutoffISOString } from '@/lib/job-utils'
+import {
+  parseJobFilters,
+  fetchFilteredJobs,
+  fetchFilteredJobsCount,
+  fetchTopJob,
+  fetchTotalActiveJobsCount,
+  fetchTotalCompaniesCount,
+  buildLoadMoreHref,
+} from '@/lib/job-query'
 import JobBoard from '@/components/JobBoard'
-import type { Job, Category } from '@/lib/types'
+import type { Category } from '@/lib/types'
 
 interface PageProps {
   params: Promise<{ slug: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 // ISR: halaman kategori di-regenerate tiap 60 detik
@@ -56,19 +65,32 @@ export async function generateStaticParams() {
   return (categories ?? []).map((cat) => ({ slug: cat.slug }))
 }
 
-export default async function CategoryPage({ params }: PageProps) {
+export default async function CategoryPage({ params, searchParams }: PageProps) {
   const { slug } = await params
+  const rawSearchParams = await searchParams
+  // slug dari path selalu jadi kategori aktif, nggak peduli ada
+  // ?kategori= lain di query string — tapi filter LAIN (tipe, gaji, dst)
+  // di query string tetap dipakai, jadi /kategori/teknologi?tipe=Full-time
+  // tetap kerja.
+  const filters = parseJobFilters(rawSearchParams, slug)
+
   const supabase = await createClient()
 
-  const [category, { data: jobs }, { data: categories }] = await Promise.all([
+  const [
+    category,
+    { jobs, hasMore },
+    resultCount,
+    totalActiveJobs,
+    totalCompanies,
+    topJob,
+    { data: categories },
+  ] = await Promise.all([
     getCategory(slug),
-    supabase
-      .from('jobs')
-      .select('*, categories(*)')
-      .eq('is_approved', true)
-      .gte('created_at', getExpiryCutoffISOString())
-      .order('is_featured', { ascending: false })
-      .order('created_at', { ascending: false }),
+    fetchFilteredJobs(supabase, filters),
+    fetchFilteredJobsCount(supabase, filters),
+    fetchTotalActiveJobsCount(supabase),
+    fetchTotalCompaniesCount(supabase),
+    fetchTopJob(supabase),
     supabase.from('categories').select('*').order('name'),
   ])
 
@@ -76,11 +98,18 @@ export default async function CategoryPage({ params }: PageProps) {
     notFound()
   }
 
+  const loadMoreHref = buildLoadMoreHref(`/kategori/${slug}`, rawSearchParams, filters.jumlah)
+
   return (
     <JobBoard
-      initialJobs={(jobs as Job[]) ?? []}
+      jobs={jobs}
+      hasMore={hasMore}
+      loadMoreHref={loadMoreHref}
+      resultCount={resultCount}
+      totalActiveJobs={totalActiveJobs}
+      totalCompanies={totalCompanies}
+      topJob={topJob}
       categories={(categories as Category[]) ?? []}
-      initialCategorySlug={category.slug}
       heroTitle={`Loker Remote ${category.name} Indonesia`}
       heroSubtitle={`Kumpulan lowongan kerja remote & WFH kategori ${category.name} yang dikurasi khusus untuk talenta Indonesia.`}
     />

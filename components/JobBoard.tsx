@@ -1,110 +1,52 @@
-'use client'
-
-import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Search } from 'lucide-react'
-import type { Job, Category, JobType, WorkArrangement } from '@/lib/types'
+import type { Category, Job } from '@/lib/types'
 import FilterBar from './FilterBar'
 import JobCard from './JobCard'
 import Sidebar from './Sidebar'
-
-export type SortOption = 'newest' | 'salary'
-
-const PAGE_SIZE = 10
+import SearchBox from './SearchBox'
 
 interface JobBoardProps {
-  initialJobs: Job[]
+  jobs: Job[]
+  hasMore: boolean
+  loadMoreHref: string
+  resultCount: number
+  totalActiveJobs: number
+  totalCompanies: number
+  topJob: Job | null
   categories: Category[]
-  // Ketiganya opsional — dipakai halaman /kategori/[slug] agar bisa
-  // reuse komponen ini tapi dengan H1 unik per kategori (bagus untuk SEO)
-  // dan filter kategori yang sudah ter-pilih dari awal.
-  initialCategorySlug?: string | null
+  // Dipakai halaman /kategori/[slug] agar bisa reuse komponen ini tapi
+  // dengan H1 unik per kategori (bagus untuk SEO).
   heroTitle?: string
   heroSubtitle?: string
 }
 
+// JobBoard SEKARANG Server Component murni — nggak lagi nyimpen state
+// filter sendiri (dulu 'use client' + useState/useMemo). Filtering &
+// pagination sudah kelar di server (lihat lib/job-query.ts), komponen
+// ini tinggal nampilin `jobs` yang sudah jadi. Interaktivitasnya sendiri
+// (kolom cari, dropdown filter) dipecah jadi SearchBox & FilterBar yang
+// masing-masing 'use client' sendiri-sendiri — biar JS yang dikirim ke
+// browser seminimal mungkin.
 export default function JobBoard({
-  initialJobs,
+  jobs,
+  hasMore,
+  loadMoreHref,
+  resultCount,
+  totalActiveJobs,
+  totalCompanies,
+  topJob,
   categories,
-  initialCategorySlug = null,
   heroTitle = 'Kerja dari rumah, tanpa drama macet jalanan.',
   heroSubtitle = 'RemotIn mengurasi lowongan remote & WFH asli untuk talenta Indonesia — dari UI/UX hingga Virtual Assistant.',
 }: JobBoardProps) {
-  const [query, setQuery] = useState('')
-  const [activeCategory, setActiveCategory] = useState<string | null>(initialCategorySlug)
-  const [activeJobType, setActiveJobType] = useState<JobType | null>(null)
-  const [activeWorkArrangement, setActiveWorkArrangement] = useState<WorkArrangement | null>(null)
-  const [minSalary, setMinSalary] = useState(0)
-  const [sortBy, setSortBy] = useState<SortOption>('newest')
-
-  // Filtering dilakukan di client karena data sudah di-fetch sekaligus dari server.
-  // Untuk skala data yang lebih besar nanti, ini bisa dipindah jadi query Supabase
-  // dengan .ilike() / .eq() di server.
-  const filteredJobs = useMemo(() => {
-    const q = query.trim().toLowerCase()
-
-    return initialJobs.filter((job) => {
-      const matchesQuery =
-        q === '' ||
-        job.title.toLowerCase().includes(q) ||
-        job.company_name.toLowerCase().includes(q)
-
-      const matchesCategory = activeCategory === null || job.categories?.slug === activeCategory
-      const matchesJobType = activeJobType === null || job.job_type === activeJobType
-      const matchesWorkArrangement =
-        activeWorkArrangement === null || job.work_arrangement === activeWorkArrangement
-      // Loker tanpa gaji dicantumkan (salary_max & salary_min null) otomatis
-      // tersembunyi begitu minSalary > 0 — nggak ada cara pastikan mereka
-      // qualify, jadi lebih aman dianggap tidak memenuhi filter.
-      const matchesSalary =
-        minSalary === 0 || (job.salary_max ?? job.salary_min ?? 0) >= minSalary
-
-      return matchesQuery && matchesCategory && matchesJobType && matchesWorkArrangement && matchesSalary
-    })
-  }, [initialJobs, query, activeCategory, activeJobType, activeWorkArrangement, minSalary])
-
-  // "newest" sengaja tidak di-sort ulang di sini — initialJobs sudah datang
-  // dari server dalam urutan featured dulu, lalu created_at terbaru (lihat
-  // app/page.tsx), jadi urutan itu otomatis kepakai lagi begitu sortBy
-  // dibalik ke "newest". Cuma "salary" yang butuh sorting eksplisit.
-  const sortedJobs = useMemo(() => {
-    if (sortBy !== 'salary') return filteredJobs
-
-    return [...filteredJobs].sort((a, b) => {
-      const salaryA = a.salary_max ?? a.salary_min ?? -1
-      const salaryB = b.salary_max ?? b.salary_min ?? -1
-      return salaryB - salaryA
-    })
-  }, [filteredJobs, sortBy])
-
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
-
-  // Setiap kali filter/sort berubah, balik ke halaman pertama — supaya
-  // hasil "Muat Lebih Banyak" dari pencarian sebelumnya nggak nyangkut
-  // dan bikin bingung ("kok cuma 2 dari 30 loker yang muncul?").
-  useEffect(() => {
-    setVisibleCount(PAGE_SIZE)
-  }, [query, activeCategory, activeJobType, activeWorkArrangement, minSalary, sortBy])
-
-  const visibleJobs = sortedJobs.slice(0, visibleCount)
-  const hasMore = visibleCount < sortedJobs.length
-
-  // Dihitung dari initialJobs (bukan hasil filter) supaya angkanya stabil
-  // sebagai gambaran keseluruhan RemotIn, nggak berubah-ubah tiap user ganti filter.
-  const totalCompanies = useMemo(
-    () => new Set(initialJobs.map((job) => job.company_name)).size,
-    [initialJobs]
-  )
-
   return (
     <main className="min-h-screen bg-[var(--color-bg)]">
       {/* ===== Hero Section ===== */}
       {/* Teal solid, bukan lagi cream — ini identitas RemotIn yang ditegaskan,
           bukan cuma jadi warna aksen kecil. Kartu loker melayang di sisi kanan
-          (desktop) pakai loker asli teratas (biasanya Featured, karena
-          initialJobs sudah di-sort is_featured dulu di app/page.tsx) — bukan
-          ilustrasi dekoratif, biar kelihatan produknya beneran, bukan hiasan. */}
+          (desktop) SENGAJA selalu topJob (loker unggulan ter-atas se-situs),
+          TIDAK ikut berubah waktu user ganti filter — biar nggak lompat-lompat. */}
       <section className="rounded-b-[2.5rem] bg-[var(--color-primary)]">
         <div className="mx-auto max-w-6xl px-6 py-16 sm:py-20 sm:pb-24">
           <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1fr_300px]">
@@ -114,7 +56,7 @@ export default function JobBoard({
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-accent)] opacity-60" />
                   <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" />
                 </span>
-                <span className="text-sm font-bold text-white">{initialJobs.length}</span> loker remote
+                <span className="text-sm font-bold text-white">{totalActiveJobs}</span> loker remote
                 aktif hari ini
               </span>
 
@@ -125,19 +67,10 @@ export default function JobBoard({
                 {heroSubtitle}
               </p>
 
-              <div className="mx-auto mt-8 flex max-w-lg items-center gap-2 rounded-full bg-white p-1.5 pl-4 shadow-[0_8px_24px_-4px_rgba(0,0,0,0.35)] lg:mx-0">
-                <Search className="h-4 w-4 flex-shrink-0 text-[var(--color-muted)]" />
-                <input
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Cari posisi atau nama perusahaan..."
-                  className="w-full bg-transparent text-sm text-[var(--color-ink)] outline-none placeholder:text-[var(--color-muted)]"
-                />
-              </div>
+              <SearchBox />
             </div>
 
-            {initialJobs[0] && (
+            {topJob && (
               <div className="hidden lg:block">
                 <div className="relative mx-auto w-64 -rotate-6">
                   <div
@@ -145,13 +78,13 @@ export default function JobBoard({
                     className="absolute inset-0 translate-x-2.5 translate-y-2.5 rounded-2xl bg-black/25"
                   />
                   <Link
-                    href={`/jobs/${initialJobs[0].id}`}
+                    href={`/jobs/${topJob.id}`}
                     className="relative block rounded-2xl bg-white p-4 shadow-xl transition hover:-translate-y-1"
                   >
                     <div className="flex items-center gap-2.5">
-                      {initialJobs[0].company_logo ? (
+                      {topJob.company_logo ? (
                         <Image
-                          src={initialJobs[0].company_logo}
+                          src={topJob.company_logo}
                           alt=""
                           width={36}
                           height={36}
@@ -159,20 +92,20 @@ export default function JobBoard({
                         />
                       ) : (
                         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-accent)] text-xs font-semibold text-[#412402]">
-                          {initialJobs[0].company_name.slice(0, 2).toUpperCase()}
+                          {topJob.company_name.slice(0, 2).toUpperCase()}
                         </span>
                       )}
                       <div className="min-w-0">
                         <p className="truncate text-xs font-semibold text-[var(--color-ink)]">
-                          {initialJobs[0].title}
+                          {topJob.title}
                         </p>
                         <p className="truncate text-[11px] text-[var(--color-muted)]">
-                          {initialJobs[0].company_name}
+                          {topJob.company_name}
                         </p>
                       </div>
                     </div>
                     <p className="mt-2.5 text-[11px] text-[var(--color-muted)]">
-                      {initialJobs[0].location}
+                      {topJob.location}
                     </p>
                   </Link>
                 </div>
@@ -187,44 +120,32 @@ export default function JobBoard({
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
           {/* Konten utama */}
           <div className="min-w-0">
-            <FilterBar
-              categories={categories}
-              activeCategory={activeCategory}
-              onCategoryChange={setActiveCategory}
-              activeJobType={activeJobType}
-              onJobTypeChange={setActiveJobType}
-              activeWorkArrangement={activeWorkArrangement}
-              onWorkArrangementChange={setActiveWorkArrangement}
-              minSalary={minSalary}
-              onMinSalaryChange={setMinSalary}
-              sortBy={sortBy}
-              onSortChange={setSortBy}
-              resultCount={sortedJobs.length}
-            />
+            <FilterBar categories={categories} resultCount={resultCount} />
 
             <div className="mt-6 flex flex-col gap-3">
-              {sortedJobs.length === 0 ? (
+              {jobs.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-[var(--color-line)] py-16 text-center text-sm text-[var(--color-muted)]">
                   Belum ada loker yang cocok. Coba ubah filter atau kata kunci pencarian.
                 </div>
               ) : (
-                visibleJobs.map((job) => <JobCard key={job.id} job={job} />)
+                jobs.map((job) => <JobCard key={job.id} job={job} />)
               )}
             </div>
 
             {hasMore && (
               <div className="mt-6 flex justify-center">
-                <button
-                  onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
+                <Link
+                  href={loadMoreHref}
+                  scroll={false}
                   className="rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-6 py-2.5 text-sm font-medium text-[var(--color-ink)] shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] hover:shadow-md active:translate-y-0 active:scale-[0.98]"
                 >
-                  Muat Lebih Banyak ({sortedJobs.length - visibleCount} lagi)
-                </button>
+                  Muat Lebih Banyak
+                </Link>
               </div>
             )}
           </div>
 
-          <Sidebar totalJobs={initialJobs.length} totalCompanies={totalCompanies} />
+          <Sidebar totalJobs={totalActiveJobs} totalCompanies={totalCompanies} />
         </div>
       </section>
     </main>

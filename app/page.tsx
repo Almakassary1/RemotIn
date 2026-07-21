@@ -1,33 +1,61 @@
 import { createClient } from '@/utils/supabase/server'
 import JobBoard from '@/components/JobBoard'
-import { getExpiryCutoffISOString } from '@/lib/job-utils'
-import type { Job, Category } from '@/lib/types'
+import {
+  parseJobFilters,
+  fetchFilteredJobs,
+  fetchFilteredJobsCount,
+  fetchTopJob,
+  fetchTotalActiveJobsCount,
+  fetchTotalCompaniesCount,
+  buildLoadMoreHref,
+} from '@/lib/job-query'
+import type { Category } from '@/lib/types'
 
-// ISR: halaman di-regenerate tiap 60 detik sekali agar loker baru
-// tetap muncul tanpa perlu redeploy manual.
+// Catatan: revalidate=60 di sini secara teknis nggak berlaku penuh
+// selama cookies() masih dipanggil di RootLayout (lihat app/layout.tsx)
+// yang bikin seluruh situs "dynamic". Dibiarkan tetap di sini sebagai
+// dokumentasi niat awal — bukan bagian dari perbaikan Fix #6 ini.
 export const revalidate = 60
 
-export default async function HomePage() {
+interface PageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+export default async function HomePage({ searchParams }: PageProps) {
+  const rawSearchParams = await searchParams
+  const filters = parseJobFilters(rawSearchParams)
+
   const supabase = await createClient()
 
-  const [{ data: jobs, error: jobsError }, { data: categories, error: categoriesError }] =
-    await Promise.all([
-      supabase
-        .from('jobs')
-        .select('*, categories(*)')
-        .eq('is_approved', true)
-        .gte('created_at', getExpiryCutoffISOString()) // sembunyikan loker > 30 hari
-        .order('is_featured', { ascending: false })
-        .order('created_at', { ascending: false }),
-      supabase.from('categories').select('*').order('name'),
-    ])
+  const [
+    { jobs, hasMore },
+    resultCount,
+    totalActiveJobs,
+    totalCompanies,
+    topJob,
+    { data: categories, error: categoriesError },
+  ] = await Promise.all([
+    fetchFilteredJobs(supabase, filters),
+    fetchFilteredJobsCount(supabase, filters),
+    fetchTotalActiveJobsCount(supabase),
+    fetchTotalCompaniesCount(supabase),
+    fetchTopJob(supabase),
+    supabase.from('categories').select('*').order('name'),
+  ])
 
-  if (jobsError) console.error('Gagal mengambil data jobs:', jobsError.message)
   if (categoriesError) console.error('Gagal mengambil data categories:', categoriesError.message)
+
+  const loadMoreHref = buildLoadMoreHref('/', rawSearchParams, filters.jumlah)
 
   return (
     <JobBoard
-      initialJobs={(jobs as Job[]) ?? []}
+      jobs={jobs}
+      hasMore={hasMore}
+      loadMoreHref={loadMoreHref}
+      resultCount={resultCount}
+      totalActiveJobs={totalActiveJobs}
+      totalCompanies={totalCompanies}
+      topJob={topJob}
       categories={(categories as Category[]) ?? []}
     />
   )
